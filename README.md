@@ -30,6 +30,8 @@ The API key is read from the `OPENAI_API_KEY` environment variable, from `.env`,
 |---|---|
 | `out/notifications/<time>-<LEVEL>-<event>.pdf` / `.md` | The notification: bottom line, what happened, why it matters for chips, expected market impact by segment, what to do and watch, precedents, current market reaction, caveats, evidence links |
 | `out/notifications/<...>.json` | Full audit trail: the event, evidence, research brief, market view, every critic round, and every agent action |
+| `out/briefs/<time>-<LEVEL>-<event>.md` | Same report section, with charts, for events analyzed but below the notify level (not notified) |
+| `out/report-<time>.pdf` | With `--once`: status board plus the latest section for every analyzed active event, opened automatically |
 | `out/status.md` | Live board of all active events: level, sources, market view, whether notified |
 | `state.db` | The shared SQLite state (signals, events, agent log, notifications). Delete it or use `--reset` to start over |
 
@@ -101,6 +103,11 @@ Reports follow the d-dev branch SITREP layout: short, table-driven, quantitative
 | Historical precedents | Match score, SOX vs S&P at +5 and +20 days, supply vs demand shock mix |
 | Projected market impact | Expected 20-day SOX move and range, direction, confidence, segment table |
 | Market so far / Actions / How we scored this | Ticker moves, 3–4 bolded actions, scoring and agent trail |
+
+**Charts** (matplotlib, embedded in every report section):
+- **WDI pies:** two donuts showing how intensity, radius and duration make up the severity total, and how concentration, buffers and utility dependency make up the vulnerability total (weighted contributions; each donut sums to its total).
+- **Map:** world view of all monitored chip sites and the storm or tsunami position, plus a zoom on the impact zone with the impact radius and the sites inside it.
+- **Stock to watch:** the last 60 trading days of the stock the analyst rates most negative (one with precedent price history; otherwise the SOX index), then today's price carried forward 20 trading days along the closest precedent's actual percent path. The shaded band is the range across all precedents. These are raw price paths, not relative to the S&P 500.
 
 ## Configuration (environment variables)
 
@@ -245,6 +252,7 @@ The alert ends with caveats.
 |---|---|
 | `agent_system.py` | **Always-on orchestrator for the multi-agent system** |
 | `agents/` | Scouts, Triage, Correlator, Research, Market Analyst, Critic, Notifier |
+| `charts.py` | Report figures: WDI factor pies, event + chip-site map, price projection for the stock to watch |
 | `scoring.py` | Report scores: cosine relevance (ported from the d-dev branch), Weather Disruption Index, `<Type>:<Name>` event labels |
 | `llm.py` | OpenAI wrapper: strict JSON schemas, retries, token accounting, fallback |
 | `store.py` | SQLite blackboard shared by the agents |

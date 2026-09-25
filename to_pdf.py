@@ -12,7 +12,8 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import (HRFlowable, KeepTogether, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table,
+from reportlab.lib.utils import ImageReader
+from reportlab.platypus import (HRFlowable, Image, KeepTogether, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table,
                                 TableStyle)
 
 INK, MUTED, RULE, HEAD_BG = colors.HexColor("#1b1f24"), colors.HexColor("#5b6470"), colors.HexColor("#d5dae0"), colors.HexColor("#f1f3f5")
@@ -91,7 +92,15 @@ def build(md_path: Path) -> Path:
         flush_table()
         if not line:
             continue
-        if line == "<pagebreak>":
+        img = re.fullmatch(r"!\[(.*?)\]\((.+?)\)", line)
+        if img:  # ![caption](path) - path relative to the markdown file
+            f = Path(img[2]) if Path(img[2]).is_absolute() else md_path.parent / img[2]
+            if f.exists():
+                iw, ih = ImageReader(str(f)).getSize()
+                story += [Spacer(1, 4), Image(str(f), width=width, height=width * ih / iw), Spacer(1, 4)]
+                if img[1]:
+                    story.append(Paragraph(inline(img[1]), S["meta"]))
+        elif line == "<pagebreak>":
             story.append(PageBreak())
         elif line.startswith("<details>"):
             in_audit = True
