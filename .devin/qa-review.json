@@ -1,0 +1,14 @@
+{
+  "pipeline_patterns": [
+    "src/watchtower/**/*.py",
+    "scripts/*.py"
+  ],
+  "pipeline_schema_notes": "Signal JSONL fields: ts (ISO8601 UTC), source_type, source_name, url, text, geo [lat,lon], entities, lang, kind_hint, credibility, signal_id. Loaded into watchtower.models.Signal; Signal.ts becomes unix seconds internally. EventCluster fields consumed by briefs.py and the TUI: severity, severity_score, components, exposure, analogs, briefs.",
+  "pipeline_sync_points": [
+    "replay JSONL schema <-> sources.py loader <-> models.Signal",
+    "analogs/*.yaml keys <-> data/analogs/_schema.py load_analogs()",
+    "chokepoints.yaml node fields <-> agents/exposure.py loader",
+    "markets.yaml keys <-> config.py MarketSpec"
+  ],
+  "pipeline_extra_checks": "Timestamps: JSONL uses ISO8601 UTC strings; models use unix seconds — verify conversion at the source boundary. Empty replay file or zero matching chokepoints must log a warning, not silently produce a zero-severity event."
+}

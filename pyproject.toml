@@ -1,0 +1,27 @@
+[project]
+name = "watchtower"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "dramfin", email = "20ramirez.diego03@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.28.1",
+    "pyyaml>=6.0.3",
+    "textual>=8.2.8",
+]
+
+[project.scripts]
+watchtower = "watchtower:main"
+
+[build-system]
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "types-pyyaml>=6.0.12.20260906",
+]

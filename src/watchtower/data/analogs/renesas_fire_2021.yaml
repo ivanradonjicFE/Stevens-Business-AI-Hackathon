@@ -1,0 +1,30 @@
+id: renesas_fire_2021
+name: Renesas Naka N3 fab fire
+date: 2021-03-19
+duration_days: 100
+region: [36.44, 140.49]
+report_region: east_asia
+mechanisms: [fire, fab_shutdown, single_source]
+sectors_hit: [autos]
+summary: >-
+  Fire in the N3 cleanroom knocked out ~2/3 of production at Renesas
+  Naka — the plant supplying roughly 30% of the global automotive MCU
+  market. Recovery to full output took ~100 days; auto OEMs worldwide
+  cut production amid the existing shortage.
+market_reaction:
+  index_move: "Auto stocks fell on added production cuts; Renesas -5%+"
+  spot_prices: "Auto MCU spot scarcity intensified"
+  lead_time_delta: "Months to full recovery"
+quantified_impact:
+  auto_mcu_share: "~30% of global automotive MCU market at one plant"
+  recovery: "~100 days to full output"
+  insurance: "Property + BI; customers bore uninsured CBI losses"
+sources:
+  - title: "Renesas fire threatens auto chip supply"
+    url: "https://www.reuters.com"
+  - title: "Renesas takes a month to restart fire-hit line"
+    url: "https://www.bloomberg.com"
+lessons: >-
+  Single-fab concentration means one cleanroom fire moves global auto
+  production. Map which OEMs buy from the node — CBI exposure lands on
+  their supply chains even without property damage.

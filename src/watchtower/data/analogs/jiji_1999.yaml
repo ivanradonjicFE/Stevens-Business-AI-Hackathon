@@ -1,0 +1,30 @@
+id: jiji_1999
+name: Taiwan Jiji (921) earthquake
+date: 1999-09-21
+duration_days: 14
+region: [23.77, 120.98]
+report_region: east_asia
+mechanisms: [seismic, fab_shutdown, power_loss]
+sectors_hit: [electronics, memory]
+summary: >-
+  M7.6 earthquake in central Taiwan cut power to Hsinchu fabs; output
+  halted for days and DRAM spot prices roughly tripled within days as
+  markets priced scarcity. The canonical example of Taiwan seismic
+  concentration risk predating the advanced-node era.
+market_reaction:
+  index_move: "DRAM spot +~300% within days (contemporary reporting)"
+  spot_prices: "Memory spot prices tripled on scarcity fears"
+  lead_time_delta: "Weeks of tight DRAM supply"
+quantified_impact:
+  dram_spike: "+~300% spot move"
+  insured_losses: "Limited vs. modern fabs — precedent event"
+  insurance: "Seismic pricing of Taiwan fab exposure repriced"
+sources:
+  - title: "Taiwan quake triples DRAM spot prices"
+    url: "https://www.wsj.com"
+  - title: "921 earthquake disrupts Taiwan chip output"
+    url: "https://www.cnet.com"
+lessons: >-
+  Taiwan seismic events move memory spot prices within days — a fast,
+  measurable market signature. Power restoration speed determines
+  whether a quake is a blip or a quarter-long shortage.

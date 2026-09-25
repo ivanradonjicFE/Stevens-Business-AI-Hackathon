@@ -1,0 +1,30 @@
+id: tianjin_2015
+name: Tianjin port explosion
+date: 2015-08-12
+duration_days: 30
+region: [39.04, 117.71]
+report_region: east_asia
+mechanisms: [casualty, port_closure, shipping_delay, chokepoint, fire]
+sectors_hit: [container_shipping, autos, electronics]
+summary: >-
+  Chemical explosions at the Port of Tianjin killed 173 and forced
+  partial closure of a top-10 global container port for weeks. Cargo
+  was diverted and backlogged; auto imports (Toyota, Hyundai logistics)
+  and electronics flows through Tianjin were directly hit.
+market_reaction:
+  index_move: "Local logistics names hit; global impact contained"
+  spot_prices: "Rerouting congestion fees at northern China ports"
+  lead_time_delta: "Weeks of congestion on diverted cargo"
+quantified_impact:
+  insured_losses: "~$2.5-3.5B insured (estimates)"
+  casualties: "173 dead, port partially closed weeks"
+  insurance: "Marine cargo, port liability, property + BI"
+sources:
+  - title: "Tianjin blasts disrupt port operations"
+    url: "https://www.reuters.com"
+  - title: "Insured losses estimated at $2.5-3.5B"
+    url: "https://www.swissre.com"
+lessons: >-
+  Port incidents combine casualty, closure, and congestion mechanisms.
+  Watch whether adjacent ports absorb capacity — diversion feasibility
+  determines whether a closure is local pain or systemic delay.

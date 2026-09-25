@@ -1,0 +1,30 @@
+id: westcoast_lockout_2002
+name: US West Coast port lockout
+date: 2002-09-27
+duration_days: 10
+region: [33.73, -118.20]
+report_region: north_america
+mechanisms: [labor_disruption, port_closure, shipping_delay]
+sectors_hit: [retail, electronics, autos, agriculture]
+summary: >-
+  A 10-day lockout shut all 29 US West Coast ports, stranding ~200
+  ships. Estimated ~$1-2B/day economic cost; backlogs took weeks to
+  clear after reopening. The reference event for labor-driven port
+  closure risk in US supply chains.
+market_reaction:
+  index_move: "Broad market muted; import-dependent retail/logistics hit"
+  spot_prices: "Air-freight substitution spiked; perishables lost"
+  lead_time_delta: "Weeks of backlog after reopening"
+quantified_impact:
+  daily_cost: "~$1-2B/day (contemporary estimates)"
+  vessels_stranded: "~200 ships, 29 ports shut"
+  insurance: "Delay exclusion fights; marine cargo disputes"
+sources:
+  - title: "West Coast ports shut in labor lockout"
+    url: "https://www.reuters.com"
+  - title: "Bush invokes Taft-Hartley to reopen ports"
+    url: "https://www.nytimes.com"
+lessons: >-
+  Labor disruptions create hard stops with slow unwind — backlog
+  clearing takes multiples of the closure length. Port-level signals
+  (work slowdowns, contract expiry) precede the shutdown itself.

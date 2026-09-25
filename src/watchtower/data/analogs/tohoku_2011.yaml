@@ -1,0 +1,30 @@
+id: tohoku_2011
+name: Tohoku earthquake and tsunami
+date: 2011-03-11
+duration_days: 90
+region: [38.32, 142.37]
+report_region: east_asia
+mechanisms: [seismic, tsunami, fab_shutdown, materials_shortage, power_loss]
+sectors_hit: [autos, electronics, silicon_wafers]
+summary: >-
+  M9.0 earthquake and tsunami hit northeast Japan. Renesas Naka (then
+  ~40% of global automotive MCU capacity) went offline for months;
+  Shin-Etsu/SUMCO wafer plants (~25% of global silicon wafer output)
+  halted. Auto production cut globally as single-source parts ran out.
+market_reaction:
+  index_move: "Nikkei -6.2% day after; global auto/semi names pressured"
+  spot_prices: "MCU and wafer spot prices spiked on scarcity fears"
+  lead_time_delta: "Months-long MCU/wafer shortages"
+quantified_impact:
+  insured_losses: "~$35-40B insured; ~$210B+ total economic"
+  wafer_share_offline: "~25% of global silicon wafer output"
+  insurance: "Property, BI, marine; largest quake loss at the time"
+sources:
+  - title: "Renesas Naka plant shutdown hits auto chip supply"
+    url: "https://www.reuters.com"
+  - title: "Japan quake disrupts silicon wafer supply"
+    url: "https://www.wsj.com"
+lessons: >-
+  Seismic events in industrial regions strike concentrated, hard-to-
+  substitute capacity. Single-source components (auto MCUs, wafer
+  stock) turn a regional quake into a global production crisis.

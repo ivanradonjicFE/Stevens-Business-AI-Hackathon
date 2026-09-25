@@ -1,0 +1,30 @@
+id: ukraine_neon_2022
+name: Russia-Ukraine war neon and palladium shock
+date: 2022-02-24
+duration_days: 365
+region: [46.48, 30.72]
+report_region: europe
+mechanisms: [geopolitical, materials_shortage, war]
+sectors_hit: [electronics, energy, autos]
+summary: >-
+  Invasion of Ukraine threatened ~50% of the world's semiconductor-
+  grade neon (Odesa processors halted) and Russian palladium (~40% of
+  mine supply). Neon spot prices spiked several-fold; chipmakers drew
+  down stockpiles and diversified sourcing over following quarters.
+market_reaction:
+  index_move: "Semis fell on invasion week; neon-focused names hit"
+  spot_prices: "Neon spot +several hundred percent; palladium +80% intraday peak"
+  lead_time_delta: "Buffered by gas stockpiles; risk repriced"
+quantified_impact:
+  neon_share: "~50% of semiconductor-grade neon (pre-war)"
+  palladium_share: "~40% of global palladium mine supply"
+  insurance: "Political risk, war exclusions, trade credit repricing"
+sources:
+  - title: "Ukraine invasion halts half of world's neon output"
+    url: "https://www.reuters.com"
+  - title: "Chipmakers brace for neon shortage"
+    url: "https://www.ft.com"
+lessons: >-
+  Materials chokepoints sit upstream of fabs — disruption shows up in
+  input prices and inventory draws weeks before output loss. Geographic
+  concentration of specialty gases is the vulnerability.

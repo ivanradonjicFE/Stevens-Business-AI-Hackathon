@@ -1,0 +1,30 @@
+id: taiwan_drought_2021
+name: Taiwan drought and fab water restrictions
+date: 2021-03-01
+duration_days: 120
+region: [24.15, 120.67]
+report_region: east_asia
+mechanisms: [drought, water_shortage, extreme_weather]
+sectors_hit: [electronics, agriculture]
+summary: >-
+  Taiwan's worst drought in ~56 years forced water restrictions on the
+  Hsinchu and Taichung science parks; TSMC ran water-truck fleets and
+  cut usage 15-25%. Output was largely preserved, but it exposed water
+  as a hard constraint on advanced-node concentration in Taiwan.
+market_reaction:
+  index_move: "Limited direct move; priced as tail risk to foundry capacity"
+  spot_prices: "No direct spike; added urgency to shortage narrative"
+  lead_time_delta: "Contained; contingency trucking absorbed impact"
+quantified_impact:
+  water_cut: "15-25% restrictions at science parks"
+  cost: "Trucking/operations cost, not volume loss"
+  insurance: "Contingent risk repriced rather than paid claims"
+sources:
+  - title: "Taiwan rations water to chipmakers in drought"
+    url: "https://www.reuters.com"
+  - title: "TSMC water trucks run during worst drought in decades"
+    url: "https://www.bloomberg.com"
+lessons: >-
+  Input-resource scarcity (water, power, gases) is a leading indicator
+  before volume loss. Watch utility-adjacent signals in fab regions —
+  they precede production impact.

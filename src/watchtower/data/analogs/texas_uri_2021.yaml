@@ -1,0 +1,30 @@
+id: texas_uri_2021
+name: Texas Winter Storm Uri fab shutdowns
+date: 2021-02-14
+duration_days: 30
+region: [30.27, -97.74]
+report_region: north_america
+mechanisms: [extreme_weather, power_loss, fab_shutdown]
+sectors_hit: [autos, electronics, energy]
+summary: >-
+  Grid failure during Winter Storm Uri forced Samsung Austin, NXP, and
+  Infineon fabs offline for roughly a month. Samsung disclosed ~$400M
+  in damage; unplanned fab shutdowns destroy in-process wafers and
+  require long requalification before output resumes.
+market_reaction:
+  index_move: "Worsened already-critical auto chip shortage"
+  spot_prices: "MCU scarcity deepened; auto production cuts extended"
+  lead_time_delta: "+4-6 weeks on affected lines"
+quantified_impact:
+  samsung_disclosed_loss: "~$360M (Samsung disclosed)"
+  austin_capacity: "Multiple fabs offline ~1 month"
+  insurance: "BI + property; grid-failure precedent for fabs"
+sources:
+  - title: "Texas storm shuts Samsung, NXP, Infineon fabs"
+    url: "https://www.reuters.com"
+  - title: "Samsung discloses ~$400M Texas shutdown impact"
+    url: "https://www.bloomberg.com"
+lessons: >-
+  Power loss is the sharpest fab killer — in-process wafers are
+  destroyed and restart takes weeks. Weather far from "semiconductor
+  country" can hit fabs (Texas freeze, Taiwan drought).

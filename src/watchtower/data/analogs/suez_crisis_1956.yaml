@@ -1,0 +1,30 @@
+id: suez_crisis_1956
+name: Suez Crisis canal closure
+date: 1956-10-29
+duration_days: 170
+region: [30.02, 32.55]
+report_region: middle_east
+mechanisms: [canal_blockage, geopolitical, chokepoint, shipping_delay, war]
+sectors_hit: [container_shipping, energy]
+summary: >-
+  Nationalization of the Suez Canal triggered the 1956 crisis; sunken
+  ships closed the canal for ~5 months, forcing Cape of Good Hope
+  rerouting at significant cost. The canonical "Suez is a single point
+  of failure" precedent — the same waterway, the same mechanism.
+market_reaction:
+  index_move: "Oil prices spiked; European fuel shortages"
+  spot_prices: "Tanker rates roughly doubled on longer routes"
+  lead_time_delta: "Months of extended transit times"
+quantified_impact:
+  closure: "~5 months closed"
+  reroute: "Cape of Good Hope adds ~7-10 days, Europe-Asia"
+  insurance: "War-risk premiums; early marine-crisis precedent"
+sources:
+  - title: "Suez Crisis of 1956"
+    url: "https://www.britannica.com"
+  - title: "Canal blocked by scuttled ships for five months"
+    url: "https://www.bbc.com"
+lessons: >-
+  When Suez closes, the market prices duration uncertainty, not the
+  incident itself. Escalating geopolitical context around the canal is
+  the highest-severity signature this pipeline can see.

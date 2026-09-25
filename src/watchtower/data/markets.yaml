@@ -1,0 +1,41 @@
+# Market verticals. Semiconductor is fully built; others demonstrate
+# that the pipeline is config-driven and extensible.
+
+markets:
+  semicon:
+    label: Semiconductor
+    index: SOX
+    watchlist: [NVDA, TSM, ASML, AMD, MU, NXPI, AVGO, QCOM, INTC, TXN, AMAT, LRCX, KLAC, "ON", STM, MCHP]
+    node_kinds: [fab, canal, strait, port, material, osat]
+    mechanisms:
+      - canal_blockage
+      - seismic
+      - extreme_weather
+      - fire
+      - drought
+      - geopolitical
+      - labor_disruption
+      - shipping_anomaly
+      - materials_shortage
+      - pandemic
+
+  auto:
+    label: Automotive
+    index: S&P500 Auto
+    watchlist: [TM, F, GM, TSLA, RIVN, STLA, HMC, APTV, MGA, BWA, LKQ, ALV, LEAR, VLEEY]
+    node_kinds: [fab, port, canal, strait]
+    mechanisms:
+      - shipping_anomaly
+      - labor_disruption
+      - materials_shortage
+      - extreme_weather
+
+  energy:
+    label: Energy
+    index: XLE
+    watchlist: [XOM, CVX, SLB, LNG, COP, EOG, MPC, VLO, PSX, OXY, HAL, BKR, TTE, SHEL]
+    node_kinds: [strait, canal, port]
+    mechanisms:
+      - geopolitical
+      - extreme_weather
+      - shipping_anomaly

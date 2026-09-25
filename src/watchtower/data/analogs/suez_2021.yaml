@@ -1,0 +1,33 @@
+id: suez_2021
+name: Ever Given Suez Canal blockage
+date: 2021-03-23
+duration_days: 6
+region: [30.02, 32.58]
+report_region: middle_east
+mechanisms: [canal_blockage, shipping_delay, chokepoint, shipping_anomaly]
+sectors_hit: [container_shipping, autos, electronics, energy]
+summary: >-
+  The 400m, 20,124 TEU container ship Ever Given grounded across the
+  Suez Canal after a sandstorm, halting traffic in both directions for
+  six days. ~$9.6B/day of trade was held (Lloyd's List estimate); 400+
+  vessels queued. Owners declared general average, producing one of the
+  largest marine GA claims ever (~$550M settled GA claim by the SCA,
+  reportedly settled near $550M).
+market_reaction:
+  index_move: "Oil +4% on day 2; semis impact via added lead-time delay"
+  spot_prices: "Container spot rates already at records; blockage added ~1-2 wk effective delay Asia-Europe"
+  lead_time_delta: "+1-2 weeks effective for Asia-Europe freight"
+quantified_impact:
+  trade_held_per_day: "$9.6B (Lloyd's List)"
+  vessels_queued: "400+"
+  insurance: "~$550M GA claim (settled); hull+cargo+liability exposure"
+sources:
+  - title: "Suez blockage costs $9.6B a day, Lloyd's List estimates"
+    url: "https://www.reuters.com"
+  - title: "Ever Given refloated after six days"
+    url: "https://www.bbc.com"
+lessons: >-
+  Chokepoint blockages scale with vessel queue length and salvage
+  uncertainty, not just days closed. For marine insurers, general
+  average exposure arrives immediately; for cargo/CBI writers, impact
+  compounds with every day of delay against already-tight supply chains.

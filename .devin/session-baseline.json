@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-09-25T16:34:55.606Z",
+  "branch": "d-dev",
+  "dirty_files": [
+    ".devin/",
+    ".gitignore",
+    ".python-version",
+    "README.md",
+    "idea.md",
+    "pyproject.toml",
+    "scripts/",
+    "sitreps/",
+    "src/",
+    "tasks/",
+    "tests/",
+    "uv.lock"
+  ]
+}

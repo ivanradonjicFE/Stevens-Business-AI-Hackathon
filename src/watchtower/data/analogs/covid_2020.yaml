@@ -1,0 +1,31 @@
+id: covid_2020
+name: COVID-19 fab and logistics shutdowns
+date: 2020-03-01
+duration_days: 730
+region: [31.20, 121.59]
+report_region: east_asia
+mechanisms: [pandemic, labor_disruption, shipping_delay, demand_whipsaw]
+sectors_hit: [electronics, autos, consumer, medical_devices]
+summary: >-
+  Lockdowns shut fabs and ports, then demand whipsawed (auto cancelled
+  orders into a consumer-electronics surge). Chip lead times stretched
+  from ~12 to 20+ weeks; auto OEMs lost an estimated $210B in 2021
+  revenue (AlixPartners). The deepest, most distributed supply shock of
+  the modern semiconductor era.
+market_reaction:
+  index_move: "SOX -38% Mar 2020 trough, then +130% over 18 months"
+  spot_prices: "Freight rates up ~10x 2019 baseline by late 2021"
+  lead_time_delta: "+8-10 weeks across MCUs, power, analog"
+quantified_impact:
+  auto_revenue_loss: "~$210B in 2021 (AlixPartners estimate)"
+  lead_times: "20+ weeks peak (Susquehanna/Bloomberg tracking)"
+  insurance: "BI/CBI claims litigation; event-cancellation losses"
+sources:
+  - title: "AlixPartners: auto industry to lose $210B in 2021"
+    url: "https://www.reuters.com"
+  - title: "Chip lead times reach 20 weeks"
+    url: "https://www.bloomberg.com"
+lessons: >-
+  Pandemic mechanisms produce correlated, multi-region, long-duration
+  disruption. Demand whipsaw can hurt more than the shutdown itself.
+  Insurance exposure concentrates in contingent BI and trade credit.

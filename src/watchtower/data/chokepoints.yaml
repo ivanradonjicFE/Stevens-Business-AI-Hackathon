@@ -1,0 +1,173 @@
+# Semiconductor supply-chain chokepoint map.
+# criticality: rough 0-1 share-of-supply / substitution-difficulty proxy.
+# kind: fab | canal | strait | port | material | osat
+
+nodes:
+  # --- Waterway chokepoints ---
+  - id: suez_canal
+    name: Suez Canal
+    kind: canal
+    geo: [30.02, 32.55]
+    criticality: 0.85
+    notes: ~12% of global trade; Asia-Europe component flows.
+  - id: strait_of_malacca
+    name: Strait of Malacca
+    kind: strait
+    geo: [1.43, 102.89]
+    criticality: 0.9
+    notes: Primary Asia-Europe/Middle East route; ~25% of traded goods.
+  - id: taiwan_strait
+    name: Taiwan Strait
+    kind: strait
+    geo: [24.5, 119.5]
+    criticality: 0.95
+    notes: Corridor between fabs and export ports; geopolitical flashpoint.
+  - id: panama_canal
+    name: Panama Canal
+    kind: canal
+    geo: [9.08, -79.68]
+    criticality: 0.6
+    notes: US East Coast-Asia route; drought-limited since 2023.
+  - id: strait_of_hormuz
+    name: Strait of Hormuz
+    kind: strait
+    geo: [26.57, 56.25]
+    criticality: 0.55
+    notes: ~20% of oil/LNG; energy-cost exposure for fabs.
+  - id: bab_el_mandeb
+    name: Bab el-Mandeb Strait
+    kind: strait
+    geo: [12.58, 43.33]
+    criticality: 0.7
+    notes: Red Sea gateway to Suez; reroute risk triggers Cape detours.
+
+  # --- Fabs ---
+  - id: tsmc_hsinchu
+    name: TSMC Hsinchu HQ/fab cluster
+    kind: fab
+    geo: [24.78, 120.99]
+    criticality: 0.95
+    notes: Advanced-node R&D + fabs; >50% of global foundry share.
+  - id: tsmc_tainan
+    name: TSMC Tainan (Fab 18)
+    kind: fab
+    geo: [23.10, 120.28]
+    criticality: 0.9
+    notes: Main 5nm/3nm capacity.
+  - id: samsung_pyeongtaek
+    name: Samsung Pyeongtaek
+    kind: fab
+    geo: [36.99, 127.09]
+    criticality: 0.75
+    notes: Largest memory fab complex.
+  - id: samsung_austin
+    name: Samsung Austin S2
+    kind: fab
+    geo: [30.44, -97.76]
+    criticality: 0.55
+    notes: Logic/RF; knocked offline by Winter Storm Uri 2021.
+  - id: sk_hynix_icheon
+    name: SK Hynix Icheon
+    kind: fab
+    geo: [37.28, 127.44]
+    criticality: 0.7
+    notes: DRAM concentration; single-site risk.
+  - id: micron_hiroshima
+    name: Micron Hiroshima
+    kind: fab
+    geo: [34.46, 132.42]
+    criticality: 0.6
+    notes: Major DRAM site; seismic zone exposure.
+  - id: smic_shanghai
+    name: SMIC Shanghai
+    kind: fab
+    geo: [31.20, 121.59]
+    criticality: 0.55
+    notes: China's leading foundry; export-control exposure.
+  - id: renesas_naka
+    name: Renesas Naka (N3)
+    kind: fab
+    geo: [36.44, 140.49]
+    criticality: 0.65
+    notes: ~2/3 of output is automotive MCU; 2021 fire site.
+
+  # --- Assembly / test (OSAT) ---
+  - id: ase_kaohsiung
+    name: ASE Kaohsiung
+    kind: osat
+    geo: [22.60, 120.30]
+    criticality: 0.7
+    notes: World's largest OSAT by revenue.
+  - id: penang_osat
+    name: Penang OSAT cluster
+    kind: osat
+    geo: [5.35, 100.30]
+    criticality: 0.6
+    notes: Broadcom/Intel/Bosch assembly-test; flood-exposed.
+
+  # --- Critical materials ---
+  - id: neon_odesa
+    name: Odesa neon processors
+    kind: material
+    geo: [46.48, 30.72]
+    criticality: 0.7
+    notes: ~50% of semiconductor-grade neon pre-2022.
+  - id: ajinomoto_abf
+    name: ABF substrate supply (Ajinomoto, Japan)
+    kind: material
+    geo: [35.65, 139.65]
+    criticality: 0.8
+    notes: ABF film used in ~all high-end IC substrates.
+  - id: spruce_pine_quartz
+    name: Spruce Pine quartz (NC)
+    kind: material
+    geo: [35.92, -82.07]
+    criticality: 0.75
+    notes: High-purity quartz for crucibles; near-monopoly site.
+
+  # --- Ports ---
+  - id: port_shanghai
+    name: Port of Shanghai
+    kind: port
+    geo: [31.23, 121.49]
+    criticality: 0.8
+    notes: Busiest container port; lockdown-sensitive.
+  - id: port_singapore
+    name: Port of Singapore
+    kind: port
+    geo: [1.26, 103.82]
+    criticality: 0.75
+    notes: Key transshipment hub on Malacca route.
+  - id: port_kaohsiung
+    name: Port of Kaohsiung
+    kind: port
+    geo: [22.62, 120.31]
+    criticality: 0.6
+    notes: Taiwan's main export gateway.
+  - id: port_busan
+    name: Port of Busan
+    kind: port
+    geo: [35.10, 129.04]
+    criticality: 0.55
+    notes: Korea's primary container gateway.
+  - id: port_la_lb
+    name: Ports of LA / Long Beach
+    kind: port
+    geo: [33.73, -118.20]
+    criticality: 0.6
+    notes: ~40% of US container imports.
+
+  # --- Demo-scenario nodes ---
+  - id: iskenderun_port
+    name: Port of Iskenderun
+    kind: port
+    geo: [36.60, 36.18]
+    criticality: 0.62
+    notes: SE Turkey container/steel port; quake-damaged Feb 2023.
+  - id: ceyhan_terminal
+    name: Ceyhan oil terminal
+    kind: material
+    geo: [36.95, 35.95]
+    criticality: 0.55
+    notes: BTC pipeline terminus; halted after Feb 2023 quake.
+

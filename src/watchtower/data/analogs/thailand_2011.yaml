@@ -1,0 +1,30 @@
+id: thailand_2011
+name: Thailand floods
+date: 2011-07-25
+duration_days: 150
+region: [14.35, 100.57]
+report_region: southeast_asia
+mechanisms: [extreme_weather, flood, fab_shutdown, osat_disruption]
+sectors_hit: [storage, electronics, autos, cameras]
+summary: >-
+  Monsoon flooding inundated seven industrial estates. Roughly a
+  quarter of global HDD capacity went offline (Western Digital,
+  Toshiba); OSAT and component fabs flooded. World Bank estimated
+  ~$45B economic damage — one of the costliest floods in history.
+market_reaction:
+  index_move: "HDD prices +50-100% spot within weeks"
+  spot_prices: "PC OEMs raised prices; HDD lead times to quarters"
+  lead_time_delta: "HDD shortage persisted ~2 quarters"
+quantified_impact:
+  economic_damage: "~$45B (World Bank estimate)"
+  hdd_capacity_offline: "~25% of global HDD production"
+  insurance: "~$15-20B insured losses; major Thai industrial estates"
+sources:
+  - title: "Thailand floods cut global hard-drive output"
+    url: "https://www.reuters.com"
+  - title: "World Bank: $45B flood damage estimate"
+    url: "https://www.worldbank.org"
+lessons: >-
+  Industrial-estate concentration is hidden single-point-of-failure
+  risk. Flood losses arrive slowly then cascade — watch industrial
+  zones, not just headline cities.
