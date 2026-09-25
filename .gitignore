@@ -6,6 +6,6 @@ dist/
 .pytest_cache/
 .ruff_cache/
 .devin/
-sitreps/
+sitreps/*.pdf
 *.pdf
 Latest_pdf.pdf
