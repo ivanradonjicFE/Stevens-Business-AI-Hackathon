@@ -5,3 +5,7 @@ __pycache__/
 dist/
 .pytest_cache/
 .ruff_cache/
+.devin/
+sitreps/
+*.pdf
+Latest_pdf.pdf

@@ -1,6 +1,0 @@
-[
-  {
-    "file": "grill-me-reminder",
-    "content": "REMINDER: If this user message is a new request or task, invoke the /grill-me skill to pressure-test it. Ask clarifying questions, expose missing context and knowledge gaps, and push back on vague or lazy prompts. Do not begin implementation until the request is well-specified. If this message is a reply to a clarifying question, simply continue the clarification flow and do not re-invoke /grill-me."
-  }
-]
