@@ -193,9 +193,7 @@ def gdelt_signals(
         try:
             resp = httpx.get(
                 GDELT_API,
-                headers={
-                    "User-Agent": "Mozilla/5.0 (compatible; watchtower/1.0)"
-                },
+                headers={"User-Agent": "Mozilla/5.0 (compatible; watchtower/1.0)"},
                 params=params,
                 timeout=timeout,
             )
@@ -217,14 +215,26 @@ def gdelt_signals(
         # with --data-urlencode is the reliable fallback.
         out = subprocess.run(
             [
-                "curl", "-s", "-m", "30", "-G", GDELT_API,
-                "--data-urlencode", f"query={query}",
-                "--data-urlencode", "mode=ArtList",
-                "--data-urlencode", "format=json",
-                "--data-urlencode", f"maxrecords={max_records}",
-                "--data-urlencode", f"startdatetime={start}",
-                "--data-urlencode", f"enddatetime={end}",
-                "--data-urlencode", "sort=DateDesc",
+                "curl",
+                "-s",
+                "-m",
+                "30",
+                "-G",
+                GDELT_API,
+                "--data-urlencode",
+                f"query={query}",
+                "--data-urlencode",
+                "mode=ArtList",
+                "--data-urlencode",
+                "format=json",
+                "--data-urlencode",
+                f"maxrecords={max_records}",
+                "--data-urlencode",
+                f"startdatetime={start}",
+                "--data-urlencode",
+                f"enddatetime={end}",
+                "--data-urlencode",
+                "sort=DateDesc",
             ],
             capture_output=True,
             check=False,
@@ -281,8 +291,6 @@ _EONET_HINT = {
     "manmade": "infrastructure",
 }
 
-_EONET_CRED = {"Green": 0.5, "Orange": 0.7, "Red": 0.85}
-
 
 def eonet_signals(
     start: str,
@@ -312,34 +320,76 @@ def eonet_signals(
     events = resp.json().get("events", [])
 
     signals = []
+    keep = {
+        "severeStorms",
+        "wildfires",
+        "volcanoes",
+        "earthquakes",
+        "floods",
+        "drought",
+        "dustHaze",
+        "snow",
+        "tempExtremes",
+    }
     for ev in events:
+        cat0 = (ev.get("categories") or [{}])[0].get("id", "")
+        if cat0 not in keep:
+            continue
         geom = ev.get("geometry") or []
         if not geom:
             continue
-        last = geom[-1]
-        coords = last.get("coordinates") or []
-        if len(coords) < 2:
-            continue
-        lon, lat = float(coords[0]), float(coords[1])
-        try:
-            dt = datetime.fromisoformat(
-                last["date"].replace("Z", "+00:00")
-            )
-        except (KeyError, ValueError):
-            continue
         cat = (ev.get("categories") or [{}])[0].get("id", "manmade")
         title = ev.get("title", "")
-        geo_e, ents = _enrich_geo_entities(title)
         hint = _EONET_HINT.get(cat, "infrastructure")
         mag = ev.get("magnitudeValue")
+        text = f"[{cat}] {title}" + (f" ({mag})" if mag else "")
+        url = ev.get("link", "")
         cred = 0.85  # satellite/official source
+
+        # entities: gazetteer match, else derive from the event title
+        # itself (e.g. "Hurricane Ida" -> ("hurricane", "hurricane ida",
+        # "ida")) so geographically-coherent events still cluster.
+        geo_e, ents = _enrich_geo_entities(title)
+        if not ents:
+            toks = [w for w in title.lower().split() if len(w) > 3]
+            ents = tuple(toks[:2]) + (title.lower(),) if toks else ()
+
+        # Emit ONE signal per event at the track/footprint midpoint —
+        # storm tracks emit geometry-per-timestamp; per-point signals
+        # flood the correlator with fragments of the same event.
+        pts = []
+        for g in geom:
+            coords = g.get("coordinates") or []
+            if len(coords) < 2:
+                continue
+            if g.get("type") == "Polygon":
+                ring = (
+                    coords[0]
+                    if coords and isinstance(coords[0][0], (list, tuple))
+                    else coords
+                )
+                xs = [c[0] for c in ring]
+                ys = [c[1] for c in ring]
+                lon, lat = sum(xs) / len(xs), sum(ys) / len(ys)
+            else:
+                lon, lat = float(coords[0]), float(coords[1])
+            pts.append((lon, lat, g.get("date", "")))
+        if not pts:
+            continue
+        lon = sum(p[0] for p in pts) / len(pts)
+        lat = sum(p[1] for p in pts) / len(pts)
+        mid = pts[len(pts) // 2][2] or pts[-1][2]
+        try:
+            dt = datetime.fromisoformat(mid.replace("Z", "+00:00"))
+        except (KeyError, ValueError):
+            continue
         signals.append(
             Signal(
                 ts=dt.timestamp(),
                 source_type="govt_advisory",
                 source_name="NASA EONET",
-                url=ev.get("link", ""),
-                text=f"[{cat}] {title}" + (f" ({mag})" if mag else ""),
+                url=url,
+                text=text,
                 geo=(lat, lon),
                 entities=ents,
                 lang="en",
