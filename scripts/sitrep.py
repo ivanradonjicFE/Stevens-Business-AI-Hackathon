@@ -285,9 +285,7 @@ def render(scenario: str, market_key: str, event: EventCluster) -> str:
     # --- precedent table (PIT-safe: no post-event market moves) ------
     L.append("### Historical precedents")
     L.append("")
-    L.append(
-        "| Event | Date | Match | Documented insured impact | Weight |"
-    )
+    L.append("| Event | Date | Match | Documented insured impact | Weight |")
     L.append("|---|---|---|---|---|")
     for analog, match in event.analogs:
         # show the same insured-loss figure the estimate is scaled from
@@ -409,6 +407,12 @@ def main() -> None:
     parser.add_argument("--pdf", action="store_true")
     parser.add_argument("--out", default="sitreps")
     parser.add_argument(
+        "--source",
+        choices=["gdelt", "eonet"],
+        default="gdelt",
+        help="live source: gdelt news (needs --live query) or eonet natural events",
+    )
+    parser.add_argument(
         "--live",
         metavar="QUERY",
         help="pull PIT news from GDELT instead of a replay file",
@@ -432,21 +436,31 @@ def main() -> None:
         exclude_analogs=SCENARIO_EXCLUSIONS.get(args.scenario, frozenset()),
     )
 
-    if args.live:
+    if args.live or args.source == "eonet":
         if not args.asof:
-            raise SystemExit("--live requires --asof YYYYMMDDHHMMSS")
+            raise SystemExit("--live/--source eonet requires --asof YYYYMMDDHHMMSS")
         from datetime import datetime as dt
+        from datetime import timedelta
 
         end = args.asof
         start_dt = dt.strptime(end, "%Y%m%d%H%M%S")
-        from datetime import timedelta
-
         start = (start_dt - timedelta(days=args.window_days)).strftime("%Y%m%d%H%M%S")
-        from watchtower.sources import gdelt_signals
+        if args.source == "eonet":
+            from watchtower.sources import eonet_signals
 
-        signals = list(gdelt_signals(args.live, start, end, max_records=100))
-        print(f"gdelt: {len(signals)} PIT signals ({start}..{end})")
-        args.scenario = args.scenario or f"live_{args.live[:20]}"
+            start_iso = (start_dt - timedelta(days=args.window_days)).strftime(
+                "%Y-%m-%d"
+            )
+            end_iso = start_dt.strftime("%Y-%m-%d")
+            signals = list(eonet_signals(start_iso, end_iso, limit=100))
+            print(f"eonet: {len(signals)} PIT signals ({start_iso}..{end_iso})")
+            args.scenario = args.scenario or "live_eonet"
+        else:
+            from watchtower.sources import gdelt_signals
+
+            signals = list(gdelt_signals(args.live, start, end, max_records=100))
+            print(f"gdelt: {len(signals)} PIT signals ({start}..{end})")
+            args.scenario = args.scenario or f"live_{args.live[:20]}"
     else:
         if not args.scenario:
             raise SystemExit("scenario required in replay mode")

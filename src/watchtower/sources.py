@@ -260,3 +260,92 @@ def gdelt_signals(
             )
         )
     yield from sorted(signals, key=lambda s: s.ts)
+
+
+EONET_API = "https://eonet.gsfc.nasa.gov/api/v3/events"
+
+# EONET category -> kind_hint (drives severity + mechanism tags)
+_EONET_HINT = {
+    "severeStorms": "extreme_weather",
+    "wildfires": "fire",
+    "volcanoes": "infrastructure",
+    "earthquakes": "seismic",
+    "floods": "flood",
+    "landslides": "infrastructure",
+    "drought": "drought",
+    "dustHaze": "extreme_weather",
+    "snow": "extreme_weather",
+    "tempExtremes": "extreme_weather",
+    "seaLakeIce": "extreme_weather",
+    "waterColor": "flood",
+    "manmade": "infrastructure",
+}
+
+_EONET_CRED = {"Green": 0.5, "Orange": 0.7, "Red": 0.85}
+
+
+def eonet_signals(
+    start: str,
+    end: str,
+    *,
+    status: str = "all",
+    limit: int = 100,
+    timeout: float = 30.0,
+) -> Iterator[Signal]:
+    """Pull PIT-compliant natural events from NASA EONET.
+
+    `start`/`end` are ISO dates (YYYY-MM-DD); `end` is the information
+    cutoff. Each event's most recent geometry point provides geo; the
+    EONET category maps onto our severity kind vocabulary so live
+    hazards score correctly out of the box.
+    """
+    import httpx
+
+    params = {
+        "status": status,
+        "limit": limit,
+        "start": start,
+        "end": end,
+    }
+    resp = httpx.get(EONET_API, params=params, timeout=timeout)
+    resp.raise_for_status()
+    events = resp.json().get("events", [])
+
+    signals = []
+    for ev in events:
+        geom = ev.get("geometry") or []
+        if not geom:
+            continue
+        last = geom[-1]
+        coords = last.get("coordinates") or []
+        if len(coords) < 2:
+            continue
+        lon, lat = float(coords[0]), float(coords[1])
+        try:
+            dt = datetime.fromisoformat(
+                last["date"].replace("Z", "+00:00")
+            )
+        except (KeyError, ValueError):
+            continue
+        cat = (ev.get("categories") or [{}])[0].get("id", "manmade")
+        title = ev.get("title", "")
+        geo_e, ents = _enrich_geo_entities(title)
+        hint = _EONET_HINT.get(cat, "infrastructure")
+        mag = ev.get("magnitudeValue")
+        cred = 0.85  # satellite/official source
+        signals.append(
+            Signal(
+                ts=dt.timestamp(),
+                source_type="govt_advisory",
+                source_name="NASA EONET",
+                url=ev.get("link", ""),
+                text=f"[{cat}] {title}" + (f" ({mag})" if mag else ""),
+                geo=(lat, lon),
+                entities=ents,
+                lang="en",
+                kind_hint=hint,
+                credibility=cred,
+                signal_id=_signal_id(dt.timestamp(), "eonet", title),
+            )
+        )
+    yield from sorted(signals, key=lambda s: s.ts)
