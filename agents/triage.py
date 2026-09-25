@@ -78,6 +78,8 @@ class TriageAgent(Agent):
             else:
                 if j["category"] not in ("typhoon", "storm", "tsunami"):  # enforce scope
                     j = {**j, "relevant": False, "reason": f"out of scope: {j['reason']}"}
+                elif j["category"] == "typhoon" and j["region"] in ("us", "americas"):
+                    j["category"] = "storm"  # Atlantic/E Pacific cyclones = hurricanes, compared with US storms
                 verdicts[sid] = {**j, "method": "llm", "rule_view": v if v["relevant"] else None}
 
         c = store.db()

@@ -8,6 +8,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
+import charts
 import config
 import llm
 import store
@@ -28,6 +29,7 @@ exactly as given (e.g. "Typhoon:Saudel-26").
 Use only facts and numbers from the input."""
 
 NOTIFY_DIR = config.OUT / "notifications"
+BRIEF_DIR = config.OUT / "briefs"            # analyzed but below the notify threshold
 REPORT_TITLE = "# Semiconductor Weather Situation Report"
 
 
@@ -88,14 +90,16 @@ class NotifierAgent(Agent):
     name = "Notifier"
 
     def run(self, ev: dict, research: dict, view: dict, critique: dict, critiques: list[dict]) -> str | None:
+        """Always write the report section (text + charts) for an analyzed event; only NOTIFY when the level is at
+        or above the threshold and the event is new or escalated. Held events land in out/briefs/."""
         level = critique["recommended_level"]
         prev = ev.get("notified_level")
         if rank(level) < rank(config.NOTIFY_MIN_LEVEL):
-            self.log("held", f"level {level} below notify threshold {config.NOTIFY_MIN_LEVEL}", ev["id"])
-            return None
-        if prev and rank(level) <= rank(prev):
-            self.log("held", f"already notified at {prev}; no escalation", ev["id"])
-            return None
+            held = f"level {level} below notify threshold {config.NOTIFY_MIN_LEVEL}"
+        elif prev and rank(level) <= rank(prev):
+            held = f"already notified at {prev}; no escalation"
+        else:
+            held = None
 
         label = ev["metrics"]["label"]
         text = llm.ask_json(WRITE_SYSTEM, json.dumps({"label": label, "level": level, "brief": research["brief"],
@@ -103,36 +107,65 @@ class NotifierAgent(Agent):
                             WRITE_SCHEMA, "notification", effort="low") or {
             "bottom_line": f"{label}: {view['headline_view']}", "what_happened": research["brief"]["summary"],
             "actions": [{"label": "Monitor", "text": a} for a in view["actionable"][:3]]}
-        md = self._render(ev, level, prev, text, research, view, critique, critiques)
-
-        NOTIFY_DIR.mkdir(parents=True, exist_ok=True)
+        folder = BRIEF_DIR if held else NOTIFY_DIR
+        folder.mkdir(parents=True, exist_ok=True)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
         safe = re.sub(r"[^A-Za-z0-9-]+", "_", label)
-        base = NOTIFY_DIR / f"{stamp}-{level}-{safe}"
+        base = folder / f"{stamp}-{level}-{safe}"
+        figs = self._figures(ev, research, view, Path(f"{base}_figs"))
+        md = self._render(ev, level, prev, text, research, view, critique, critiques, figs, held)
         base.with_suffix(".md").write_text(md)
-        pdf = build_pdf(base.with_suffix(".md"))
         base.with_suffix(".json").write_text(json.dumps(
-            {"event": ev, "level": level, "notification": text, "research": {k: v for k, v in research.items() if k != "_ext"},
-             "market_view": view, "critiques": critiques, "trace": store.rows(
+            {"event": ev, "level": level, "notified": not held, "held_reason": held, "notification": text,
+             "research": {k: v for k, v in research.items() if k != "_ext"}, "market_view": view,
+             "critiques": critiques, "trace": store.rows(
                 "SELECT * FROM agent_log WHERE event_id=? ORDER BY ts", (ev["id"],))}, indent=2, default=str))
+        ev["analysis"]["report_md"] = str(base.with_suffix(".md"))
+        store.save_event(ev)
+        if held:
+            self.log("held", f"{held} (brief with charts written: {base.name}.md)", ev["id"])
+            return None
+        pdf = build_pdf(base.with_suffix(".md"))
         store.db().execute("INSERT INTO notifications VALUES (?,?,?,?)", (store.now(), ev["id"], level, str(pdf)))
         store.db().execute("UPDATE events SET notified_level=?, notified_at=? WHERE id=?", (level, store.now(), ev["id"]))
         store.db().commit()
         self.log("NOTIFIED", f"{label} {level} ({'escalated from ' + prev if prev else 'new'}) -> {pdf.name}", ev["id"])
         return str(pdf)
 
-    def _render(self, ev, level, prev, t, research, view, critique, critiques) -> str:
+    def _figures(self, ev: dict, research: dict, view: dict, folder: Path) -> dict:
+        """Charts for the report; a failed chart is logged and skipped, never blocks the notification."""
+        m, out = ev["metrics"], {}
+        jobs = {"pies": lambda p: charts.wdi_pies(m["wdi"], p),
+                "map": lambda p: charts.site_map(m, p),
+                "projection": lambda p: charts.projection_chart(
+                    charts.watch_ticker(view, research["_ext"]["analogs"]), research["_ext"]["analogs"],
+                    m["label"], m["severity"], p)}
+        for name, job in jobs.items():
+            try:
+                f = job(folder / f"{name}.png")
+                if f:
+                    out[name] = f"{folder.name}/{name}.png"   # relative to the notification markdown
+            except Exception as ex:
+                self.log("chart failed", f"{name}: {type(ex).__name__}: {ex}", ev["id"])
+        return out
+
+    def _render(self, ev, level, prev, t, research, view, critique, critiques, figs=None, held=None) -> str:
+        figs = figs or {}
+        img = lambda k: [f"![]({figs[k]})", ""] if k in figs else []
         brief, ext, m = research["brief"], research["_ext"], ev["metrics"]
         now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
         mv = view["expected_sox_move"]
         L = _cutoff_header(now) + event_header(ev, level)
+        if held:
+            L += [f"**Status:** not notified ({held}). Monitoring brief only.", ""]
         L += [f"**Bottom line:** {t['bottom_line']}", "", f"**What happened:** {t['what_happened']}", ""]
-        L += wdi_table(m["wdi"])
+        L += wdi_table(m["wdi"]) + img("pies")
 
         # exposure: top sites in the impact zone
         if m.get("exposed"):
             L += ["### Sites in the impact zone", "", "| Site | Type | Distance | Score |", "|---|---|---|---|"]
             L += [f"| {x[0]} | {x[1]} | {x[2]} km | {sc:.2f} |" for x, sc in zip(m["exposed"][:4], m["site_scores"])] + [""]
+        L += img("map")
 
         # precedents with match scores
         L += ["### Historical precedents", "",
@@ -151,6 +184,7 @@ class NotifierAgent(Agent):
               f"(range {mv['low']:+.1f}% to {mv['high']:+.1f}%) | direction **{view['direction']}** | "
               f"confidence **{view['confidence']}**."
               + (f" Rule baseline (match-weighted, severity-scaled): {p20['expected']:+.1f}%." if p20 else ""), ""]
+        L += img("projection")
         segs = [s for s in view["segments"] if s["tickers"]][:4]
         if segs:
             L += ["| Segment | Tickers | Direction | Why |", "|---|---|---|---|"]
@@ -206,13 +240,15 @@ def write_status_board():
 
 
 def write_run_report() -> Path:
-    """One PDF for the whole run: status board + the latest full notification of every active event."""
+    """One PDF for the whole run: status board + the latest report section (notification or monitoring brief,
+    with charts) of every analyzed active event, highest level first."""
     parts = [(config.OUT / "status.md").read_text()]
-    for e in store.rows("SELECT * FROM events WHERE status='active' AND notified_level IS NOT NULL"):
-        last = store.rows("SELECT path FROM notifications WHERE event_id=? ORDER BY ts DESC LIMIT 1", (e["id"],))
-        md = Path(last[0]["path"]).with_suffix(".md") if last else None
-        if md and md.exists():
-            body = md.read_text()
+    evs = [e for e in store.rows("SELECT * FROM events WHERE status='active'") if (e.get("analysis") or {}).get("report_md")]
+    evs.sort(key=lambda e: (-rank(e["analysis"].get("final_level")), -e["metrics"].get("wdi", {}).get("wdi", 0)))
+    for e in evs:
+        md = Path(e["analysis"]["report_md"])
+        if md.exists():
+            body = re.sub(r"!\[(.*?)\]\((?!/)", rf"![\1]({md.parent.name}/", md.read_text())
             if body.startswith(REPORT_TITLE):  # one report title + cutoff for the whole document
                 body = body.split("\n---\n", 1)[-1]
             parts.append(body)

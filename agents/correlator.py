@@ -117,6 +117,7 @@ class CorrelatorAgent(Agent):
                    "start": min(s["data"]["time"] for s in sigs), "notes": notes,
                    "exposed": ht.get("exposed", []), "site_scores": ht.get("site_scores", []),
                    "radius_km": ht.get("radius_km", 0), "alert": hd["alert"] if hd else None,
+                   "lat": hd.get("lat") if hd else None, "lon": hd.get("lon") if hd else None,
                    "wind_kmh": hd.get("intensity") if hd else None, "magnitude": hd.get("magnitude") if hd else None,
                    "duration_h": (hd.get("duration_h") if hd and hd.get("duration_h") else max(span_h, 12)),
                    "cosine_relevance": scoring.cosine_relevance(docs),
