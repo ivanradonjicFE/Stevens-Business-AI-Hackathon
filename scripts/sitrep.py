@@ -309,11 +309,17 @@ def render(scenario: str, market_key: str, event: EventCluster) -> str:
             if est >= PCS_THRESHOLD_USD
             else "below the PCS $25M catastrophe-designation threshold"
         )
+        thin = ""
+        if len(rows) < 2 or max(m for _, m, _ in rows) < 0.3:
+            thin = (
+                " **Thin precedent set — treat as order-of-magnitude "
+                "only, not a booking estimate.**"
+            )
         L.append(
             f"Match-weighted mean of documented analog losses: "
             f"**${est / 1e6:,.0f}M** "
             f"(precedent range ${lo / 1e6:,.0f}M–${hi / 1e6:,.0f}M; "
-            f"each weight is the row's match score above). {pcs}."
+            f"each weight is the row's match score above). {pcs}.{thin}"
         )
         L.append("")
     else:
@@ -350,7 +356,8 @@ def render(scenario: str, market_key: str, event: EventCluster) -> str:
             "region; no claims surge expected at current severity, but "
             "the corroboration trend justifies a daily re-score."
         )
-    if projected and est >= PCS_THRESHOLD_USD:
+    strong = projected and (len(rows) >= 2 and max(m for _, m, _ in rows) >= 0.3)
+    if strong and est >= PCS_THRESHOLD_USD:
         L.append(
             f"- **Reinsurance notification:** projected "
             f"${est / 1e6:,.0f}M clears the PCS $25M designation line — "
@@ -358,11 +365,19 @@ def render(scenario: str, market_key: str, event: EventCluster) -> str:
             f"availability for the exposed portfolio."
         )
     else:
-        L.append(
-            "- **Reinsurance:** projected exposure below the PCS $25M "
-            "catastrophe-designation threshold; standard retention "
-            "expected to absorb — no notification required yet."
-        )
+        if projected and est >= PCS_THRESHOLD_USD:
+            L.append(
+                "- **Reinsurance:** projected exposure exceeds the "
+                "PCS $25M threshold but rests on a thin precedent set — "
+                "verify analog basis before any notification."
+            )
+        else:
+            L.append(
+                "- **Reinsurance:** projected exposure below the PCS "
+                "$25M catastrophe-designation threshold; standard "
+                "retention expected to absorb — no notification "
+                "required yet."
+            )
     exposed = ", ".join(n.name for n, _ in event.exposure[:3]) or "the affected region"
     L.append(
         f"- **Portfolio triage:** proximity-ranked watchlist — "
@@ -428,6 +443,12 @@ def main() -> None:
         default=3,
         help="look-back window before --asof for --live",
     )
+    parser.add_argument(
+        "--event",
+        metavar="SUBSTR",
+        help="report on the event whose title contains this text "
+        "(default: highest-severity cluster)",
+    )
     args = parser.parse_args()
 
     market = load_markets()[args.market]
@@ -471,7 +492,19 @@ def main() -> None:
     events = orch.correlator.active_events()
     if not events:
         raise SystemExit(f"no events formed for {args.scenario}")
-    top = max(events, key=lambda e: e.severity_score)
+    if args.event:
+        pat = re.compile(r"\b" + re.escape(args.event.lower()) + r"\b")
+        picked = [
+            e
+            for e in events
+            if pat.search(e.title.lower())
+            or pat.search(" ".join(s.text for s in e.signals[:3]).lower())
+        ]
+        if not picked:
+            raise SystemExit(f"no event matching {args.event!r}")
+        top = max(picked, key=lambda e: e.severity_score)
+    else:
+        top = max(events, key=lambda e: e.severity_score)
 
     md = render(args.scenario, args.market, top)
     out_dir = Path(args.out)
