@@ -352,7 +352,7 @@ def eonet_signals(
         geo_e, ents = _enrich_geo_entities(title)
         if not ents:
             toks = [w for w in title.lower().split() if len(w) > 3]
-            ents = tuple(toks[:2]) + (title.lower(),) if toks else ()
+            ents = (tuple(toks[:2]) + (title.lower(),)) if toks else ()
 
         # Emit ONE signal per event at the track/footprint midpoint —
         # storm tracks emit geometry-per-timestamp; per-point signals
@@ -378,6 +378,31 @@ def eonet_signals(
             continue
         lon = sum(p[0] for p in pts) / len(pts)
         lat = sum(p[1] for p in pts) / len(pts)
+        # Anchor to the nearest supply-chain node: adds the node name
+        # to entities (for clustering when the title carries no gazetteer
+        # hit) and to text (the relevance cosine scores signal.text, so
+        # geo terms give it real supply-chain vocabulary to match on).
+        try:
+            from watchtower.config import load_chokepoints
+            from watchtower.geo import haversine_km
+
+            nodes = load_chokepoints()
+            nearest = min(
+                nodes,
+                key=lambda n: haversine_km((lat, lon), n.geo),
+            )
+            dist_km = haversine_km((lat, lon), nearest.geo)
+            if not ents:
+                ents = tuple(
+                    w.lower()
+                    for w in nearest.name.replace("/", " ").split()
+                    if len(w) > 3
+                ) or ("natural_hazard",)
+            text = f"{text} (nearest supply node: {nearest.name}, {dist_km:.0f}km)"
+        except (ImportError, FileNotFoundError, KeyError):
+            # chokepoint data unavailable: degrade, don't hide
+            if not ents:
+                ents = ("natural_hazard",)
         mid = pts[len(pts) // 2][2] or pts[-1][2]
         try:
             dt = datetime.fromisoformat(mid.replace("Z", "+00:00"))

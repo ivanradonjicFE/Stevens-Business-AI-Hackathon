@@ -11,7 +11,7 @@
 https://eonet.gsfc.nasa.gov/api/v3/events/EONET_5900
 
 **Corroboration:** 4 signals, 1 source types | **Region:** north_america | **Market lens:** semicon
-**Relevance to semicon:** 0.0 / 1 (cosine similarity, signal text vs market context)
+**Relevance to semicon:** 0.04 / 1 (cosine similarity, signal text vs market context)
 
 ### Weather Disruption Index (WDI)
 
