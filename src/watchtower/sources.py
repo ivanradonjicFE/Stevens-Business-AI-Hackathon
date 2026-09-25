@@ -14,6 +14,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import time
 from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
@@ -315,9 +316,19 @@ def eonet_signals(
         "start": start,
         "end": end,
     }
-    resp = httpx.get(EONET_API, params=params, timeout=timeout)
-    resp.raise_for_status()
-    events = resp.json().get("events", [])
+    # EONET is unthrottled-free but slow at high limits; retry on
+    # transient read timeouts so a single hiccup doesn't sink a demo.
+    events = []
+    for attempt in range(3):
+        try:
+            resp = httpx.get(EONET_API, params=params, timeout=timeout)
+            resp.raise_for_status()
+            events = resp.json().get("events", [])
+            break
+        except httpx.ReadTimeout:
+            if attempt == 2:
+                raise
+            time.sleep(2 * (attempt + 1))
 
     signals = []
     keep = {
