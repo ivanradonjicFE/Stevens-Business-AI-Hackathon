@@ -392,13 +392,16 @@ def eonet_signals(
                 key=lambda n: haversine_km((lat, lon), n.geo),
             )
             dist_km = haversine_km((lat, lon), nearest.geo)
-            if not ents:
-                ents = tuple(
-                    w.lower()
-                    for w in nearest.name.replace("/", " ").split()
-                    if len(w) > 3
-                ) or ("natural_hazard",)
-            text = f"{text} (nearest supply node: {nearest.name}, {dist_km:.0f}km)"
+            if dist_km <= 1500:
+                if not ents:
+                    ents = tuple(
+                        w.lower()
+                        for w in nearest.name.replace("/", " ").split()
+                        if len(w) > 3
+                    ) or ("natural_hazard",)
+                text = (
+                    f"{text} (nearest supply node: {nearest.name}, " f"{dist_km:.0f}km)"
+                )
         except (ImportError, FileNotFoundError, KeyError):
             # chokepoint data unavailable: degrade, don't hide
             if not ents:
