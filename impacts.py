@@ -1,5 +1,6 @@
 """Split a historical event's impact into supply shocks vs demand shocks, fetched live from Wikipedia each run."""
 import re
+import threading
 import time
 
 import requests
@@ -30,6 +31,15 @@ WIKI_QUERY = {
     "gaemi-2024": ("Typhoon Gaemi", None),
     "helene-2024": ("Hurricane Helene", r"quartz|Spruce Pine|supply|manufactur|plant|shortage|econom"),
     "krathon-2024": ("Typhoon Krathon", None),
+    "indian-ocean-2004": ("2004 Indian Ocean earthquake and tsunami", None),
+    "morakot-2009": ("Typhoon Morakot", None),
+    "soudelor-2015": ("Typhoon Soudelor", None),
+    "jebi-2018": ("Typhoon Jebi 2018", None),
+    "mangkhut-2018": ("Typhoon Mangkhut", None),
+    "hagibis-2019": ("Typhoon Hagibis", None),
+    "hinnamnor-2022": ("Typhoon Hinnamnor", None),
+    "harvey-2017": ("Hurricane Harvey", r"chemical|plant|refiner|port|supply|econom|industr"),
+    "ida-2021": ("Hurricane Ida", r"chemical|plant|refiner|port|supply|econom|industr|chip"),
 }
 
 SUPPLY = re.compile(r"production|output|manufactur\w*|\bfabs?\b|factor(?:y|ies)|plants?\b|facilit\w+|wafers?|"
@@ -47,8 +57,16 @@ CASUALTY = re.compile(r"killed|deaths?|fatalit\w+|injur\w+|missing persons?|peop
 MAX_LEN = 230
 
 
+_wiki_lock = threading.Lock()
+
+
 def _get(params: dict) -> dict:
-    """Wikipedia throttles bursts (429); pace requests and honor Retry-After."""
+    """Wikipedia throttles bursts (429); pace requests (one at a time across threads) and honor Retry-After."""
+    with _wiki_lock:
+        return _get_unlocked(params)
+
+
+def _get_unlocked(params: dict) -> dict:
     for attempt in range(6):
         r = S.get(WIKI, params={**params, "format": "json", "maxlag": 5}, timeout=20)
         if r.ok and r.text.startswith("{"):

@@ -41,13 +41,16 @@ SITES = [
 ALERT_FACTOR = {"Red": 1.0, "Orange": 0.6, "Green": 0.3}
 RELEVANCE_THRESHOLD = 0.12
 COUNTRY_MATCH_MAX_KM = 500  # country-level match only when the event centroid is reasonably close
-HAZARD_CATEGORY = {"EQ": "earthquake", "TC": "typhoon", "FL": "flood", "DR": "drought", "WF": "wildfire", "VO": "volcano"}
+HAZARD_CATEGORY = {"TC": "typhoon", "TS": "tsunami"}
+# Scope: tropical cyclones (hurricanes / typhoons / tropical storms) and tsunamis only
+SCOPE_KINDS = set(HAZARD_CATEGORY)
+SCOPE_CATEGORIES = {"typhoon", "storm", "tsunami"}
 
 
 def impact_radius_km(e: Event) -> float:
-    if e.kind == "EQ":  # fabs halt tools at low shaking intensity, so be generous
-        return 60 * 2 ** ((e.magnitude or 5) - 4.5)
-    return {"TC": 450, "FL": 150, "WF": 60, "VO": 250, "DR": 0}.get(e.kind, 100)
+    if e.kind == "TS":  # tsunami reach grows with quake size: ~200 km at M7, 400 km at M8, 800 km at M9
+        return max(150, 200 * 2 ** ((e.magnitude or 7) - 7))
+    return {"TC": 450}.get(e.kind, 100)
 
 
 @dataclass
@@ -59,9 +62,13 @@ class Assessment:
     severity: int                      # 1 minor, 2 moderate, 3 major
     exposed: list[tuple] = field(default_factory=list)   # (site, kind, distance_km, why)
     rationale: list[str] = field(default_factory=list)
+    site_scores: list[float] = field(default_factory=list)  # per exposed site, same order
+    radius_km: float = 0.0
 
 
 def assess_hazard(e: Event) -> Assessment | None:
+    if e.kind not in SCOPE_KINDS or e.lat is None or e.lat != e.lat:  # out of scope / no location (NaN)
+        return None
     radius = impact_radius_km(e)
     alert_f = ALERT_FACTOR.get(e.alert, 0.3)
     best, exposed = 0.0, []
@@ -82,24 +89,23 @@ def assess_hazard(e: Event) -> Assessment | None:
     top_region = exposed[0][4]
     category = HAZARD_CATEGORY.get(e.kind, e.kind)
     if category == "typhoon" and top_region in ("us", "americas"):
-        category = "storm"
-    if exposed[0][1] in ("chokepoint", "port") and category in ("typhoon", "storm"):
-        category = "shipping_chokepoint"
+        category = "storm"  # hurricanes: matched against US storm precedents
     sev = {"Red": 3, "Orange": 2}.get(e.alert, 1)
-    if e.magnitude and e.kind == "EQ":
-        sev = max(sev, 3 if e.magnitude >= 7 else 2 if e.magnitude >= 6 else 1)
+    if e.magnitude and e.kind == "TS":
+        sev = max(sev, 3 if e.magnitude >= 8 else 2 if e.magnitude >= 7 else 1)
     rationale = [
         f"{e.source} reports {e.title} (alert level {e.alert}"
         + (f", magnitude {e.magnitude:.1f}" if e.magnitude else "") + ").",
-        f"Impact radius used: {radius:.0f} km for this event type" + (" + country-level match" if e.kind in ("FL", "DR", "TC") else "") + ".",
+        f"Impact radius used: {radius:.0f} km for this event type" + (" + country-level match" if e.kind == "TC" else "") + ".",
     ] + [f"Exposed: {n} ({k}) at {d} km - {why}. Score {s:.2f}." for n, k, d, why, _, s in exposed[:4]]
     return Assessment(e, round(best, 2), category, top_region, sev,
-                      [x[:4] for x in exposed[:6]], rationale)
+                      [x[:4] for x in exposed[:6]], rationale,
+                      site_scores=[round(x[5], 3) for x in exposed[:6]], radius_km=radius)
 
 
 # ---- news -----------------------------------------------------------------
 SEMI_RE = re.compile(r"\b(semiconductors?|chipmakers?|chip (?:plants?|factor(?:y|ies)|supply|shortages?|exports?|makers?)|"
-                     r"foundr(?:y|ies)|wafers?|TSMC|SK hynix|Samsung Electronics|Micron|ASML|lithography|gallium|"
+                     r"foundr(?:y|ies)|fabs?|wafers?|TSMC|SK hynix|Samsung Electronics|Micron|ASML|lithography|gallium|"
                      r"germanium|neon gas|helium|photoresist|memory chips?|advanced chips?)\b", re.I)
 SHIP_RE = re.compile(r"\b(Taiwan Strait|Malacca|Red Sea|Suez|Bab el-Mandeb|Panama Canal|Hormuz|Black Sea|"
                      r"container (?:ships?|shipping)|shipping (?:lanes?|routes?|disruption)|port (?:closure|strike)s?|"
@@ -109,22 +115,14 @@ NOISE_RE = re.compile(r"\b(talent|workforce|skills?|engineers?|jobs|hiring|stock
 # Alarmist headline language: often the first signal, often wrong
 ALARM_RE = re.compile(r"\b(crisis|chaos|catastroph\w*|unprecedented|panic\w*|collapse\w*|meltdown|apocalyp\w*|"
                       r"nightmare|brink|all-out|imminent|devastat\w*|shock\w*|state of emergency)\b|!", re.I)
-CATEGORY_RE = [  # first match wins
-    ("export_control", r"export (?:controls?|bans?|restrictions?|curbs?|licen[cs]es?)|entity list|sanctions?|tariffs?"),
-    ("conflict", r"blockade|military drills?|invasion|missiles?|\bwar\b|airstrikes?|mobiliz\w+|escalat\w+|\bcoup\b|troops"),
-    ("shipping_chokepoint", r"canal|strait|port (?:closure|strike)s?|strikes? at|blocked|seiz\w+|reopen\w*|rerout\w*|"
-                            r"divert\w*|shipping disruption|congestion|Houthis?|attacks? on (?:ships?|vessels?|tankers?)"),
-    ("earthquake", r"earthquakes?|quakes?|tremors?"),
-    ("typhoon", r"typhoons?|hurricanes?|cyclones?|tropical storms?"),
-    ("flood", r"floods?|flooding"),
-    ("drought", r"droughts?|water (?:shortage|rationing)"),
-    ("fab_fire_outage", r"\bfires?\b|blaze|explosions?|power (?:outages?|cuts?)|blackouts?|outages?|contamination"),
-    ("shortage", r"shortages?|supply crunch|tight supply"),
+CATEGORY_RE = [  # first match wins; scope is tropical cyclones and tsunamis
+    ("tsunami", r"tsunamis?"),
+    ("typhoon", r"typhoons?|hurricanes?|cyclones?|tropical (?:storms?|depressions?)"),
 ]
 REGION_RE = {
     "taiwan": r"Taiwan|Hsinchu|Tainan|Taichung|Kaohsiung|TSMC",
     "japan": r"Japan|Kumamoto|Renesas|Kioxia",
-    "korea": r"Korea|Samsung|SK hynix|Busan",
+    "korea": r"Korea|(?<!Samsung )(?:SK hynix|Busan)|Samsung(?! Austin| Taylor)",
     "china": r"China|Chinese|Beijing|Shanghai|SMIC|South China Sea",
     "sea": r"Malaysia|Singapore|Penang|Vietnam|Philippines|Thailand|Malacca",
     "us": r"\bU\.?S\.?\b|United States|America|Arizona|Texas|Oregon|Intel|Washington",
@@ -132,15 +130,29 @@ REGION_RE = {
     "middle_east": r"Red Sea|Suez|Houthis?|Hormuz|Iran\w*|Yemen\w*|Israel\w*|Gaza|Saudi|Qatar\w*|Gulf",
     "americas": r"Panama",
 }
-# Wars/closures that never mention chips can still hit them if they are in these regions
-GEO_REGIONS = {"taiwan", "china", "korea", "japan", "sea", "middle_east", "europe", "americas"}
-GEO_CATEGORIES = {"conflict", "shipping_chokepoint", "export_control"}
+# Storms/tsunamis that never mention chips can still hit them if they strike these regions
+GEO_REGIONS = {"taiwan", "china", "korea", "japan", "sea", "us"}
+GEO_CATEGORIES = {"typhoon", "tsunami"}
 
 
 def _region(title: str) -> str:
-    # The US is named as an actor in lots of foreign news ("US and Iran discuss..."), so it counts half
-    hits = {r: len(re.findall(rx, title, re.I)) * (0.5 if r == "us" else 1) for r, rx in REGION_RE.items()}
+    hits = {r: len(re.findall(rx, title, re.I)) for r, rx in REGION_RE.items()}
     return max(hits, key=hits.get) if any(hits.values()) else "global"
+
+
+def classify_headline(title: str) -> dict | None:
+    """Rule-based read of one headline (the triage agent's fallback). None = not relevant."""
+    if NOISE_RE.search(title):
+        return None
+    semi, ship = SEMI_RE.search(title), SHIP_RE.search(title)
+    cat = next((c for c, rx in CATEGORY_RE if re.search(rx, title, re.I)), None)
+    if not cat:
+        return None
+    region = _region(title)
+    link = "semis" if semi else "shipping" if ship else "geo" if (cat in GEO_CATEGORIES and region in GEO_REGIONS) else None
+    if not link:
+        return None
+    return {"category": cat, "region": region, "link": link, "alarmist": bool(ALARM_RE.search(title))}
 
 
 def assess_news(news: list[Event]) -> list[Assessment]:

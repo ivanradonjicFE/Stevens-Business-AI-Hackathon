@@ -7,7 +7,8 @@ from impacts import shocks
 from semis import Assessment
 
 CATEGORY_LABEL = {
-    "earthquake": "Earthquake", "typhoon": "Typhoon / tropical cyclone", "storm": "Severe storm",
+    "earthquake": "Earthquake", "typhoon": "Typhoon / tropical cyclone", "storm": "Hurricane / severe storm",
+    "tsunami": "Tsunami",
     "flood": "Flood", "drought": "Drought / water shortage", "wildfire": "Wildfire", "volcano": "Volcanic activity",
     "fab_fire_outage": "Fab fire / power outage", "export_control": "Export controls / trade restrictions",
     "conflict": "Geopolitical / military tension", "shipping_chokepoint": "Shipping chokepoint disruption",

@@ -6,7 +6,43 @@ import yfinance as yf
 
 # Curated past shocks. Dates are the day the shock hit/was announced; reactions are NOT hardcoded -
 # they are measured from market data so every number in an alert is reproducible.
+# In scope: tropical cyclones (hurricanes/typhoons), tsunamis, and closely related severe weather.
 ANALOGS = [
+    # (id, date, category, region, severity 1-3, name, what happened)
+    ("tohoku-2011", "2011-03-11", "tsunami", "japan", 3, "Tohoku earthquake & tsunami (M9.0), Japan",
+     "Renesas MCU fabs and Shin-Etsu/SUMCO wafer plants offline for months; auto chip shortage."),
+    ("indian-ocean-2004", "2004-12-26", "tsunami", "sea", 3, "Indian Ocean tsunami",
+     "Catastrophic human toll around the Indian Ocean; limited direct chip-industry impact."),
+    ("morakot-2009", "2009-08-07", "typhoon", "taiwan", 2, "Typhoon Morakot, Taiwan",
+     "Record rainfall and landslides in southern Taiwan; fabs largely kept running."),
+    ("soudelor-2015", "2015-08-07", "typhoon", "taiwan", 1, "Typhoon Soudelor, Taiwan",
+     "Widespread power outages in northern Taiwan; chipmakers reported limited impact."),
+    ("jebi-2018", "2018-09-04", "typhoon", "japan", 2, "Typhoon Jebi, Japan",
+     "Kansai Airport, an electronics air-freight hub, flooded and shut; full operations took weeks."),
+    ("mangkhut-2018", "2018-09-16", "typhoon", "china", 2, "Typhoon Mangkhut, Hong Kong / Guangdong",
+     "Hong Kong and Guangdong ports and factories shut for days."),
+    ("hagibis-2019", "2019-10-12", "typhoon", "japan", 2, "Typhoon Hagibis, Japan",
+     "Flooding across eastern Japan halted factories and disrupted logistics."),
+    ("hinnamnor-2022", "2022-09-06", "typhoon", "korea", 1, "Typhoon Hinnamnor, South Korea",
+     "POSCO's Pohang steelworks flooded; chip fabs unaffected."),
+    ("gaemi-2024", "2024-07-24", "typhoon", "taiwan", 1, "Typhoon Gaemi, Taiwan",
+     "Markets/offices closed; fabs kept running with limited impact."),
+    ("krathon-2024", "2024-10-03", "typhoon", "taiwan", 1, "Typhoon Krathon, Kaohsiung",
+     "Southern Taiwan shut for two days; TSMC fabs kept running."),
+    ("harvey-2017", "2017-08-25", "storm", "us", 2, "Hurricane Harvey, Texas",
+     "Gulf Coast petrochemical plants shut, tightening chemical supply."),
+    ("ida-2021", "2021-08-29", "storm", "us", 2, "Hurricane Ida, Louisiana",
+     "Chemical plants and ports in Louisiana shut during the chip shortage."),
+    ("helene-2024", "2024-09-27", "storm", "us", 2, "Hurricane Helene floods Spruce Pine, NC",
+     "Quartz mines supplying most high-purity quartz shut for weeks."),
+    ("uri-2021", "2021-02-15", "storm", "us", 2, "Winter Storm Uri, Texas",
+     "Grid failure shut Samsung, NXP and Infineon Austin fabs for weeks; worsened auto chip shortage."),
+    ("thai-floods-2011", "2011-10-10", "flood", "sea", 3, "Thailand industrial-estate floods",
+     "Hard-drive and component plants underwater for weeks; HDD prices roughly doubled."),
+]
+
+# Out of current scope (earthquakes without tsunami, geopolitics, trade, fires, shipping). Kept for reference.
+OUT_OF_SCOPE_ANALOGS = [
     # (id, date, category, region, severity 1-3, name, what happened)
     ("chichi-1999", "1999-09-21", "earthquake", "taiwan", 3, "Chi-Chi earthquake (M7.6), Taiwan",
      "Island-wide power cuts halted Hsinchu fabs for ~1-2 weeks; DRAM spot prices spiked."),
@@ -47,6 +83,7 @@ ANALOGS = [
     ("krathon-2024", "2024-10-03", "typhoon", "taiwan", 1, "Typhoon Krathon, Kaohsiung",
      "Southern Taiwan shut for two days; TSMC fabs kept running."),
 ]
+OUT_OF_SCOPE_ANALOGS = [a for a in OUT_OF_SCOPE_ANALOGS if a[0] not in {x[0] for x in ANALOGS}]
 
 TICKERS = {"^SOX": "PHLX Semiconductor Index", "TSM": "TSMC", "MU": "Micron", "ASML": "ASML",
            "INTC": "Intel", "BDRY": "Dry-bulk shipping ETF", "ZIM": "ZIM container shipping"}
@@ -55,7 +92,8 @@ HORIZONS = (1, 5, 20)  # trading days after the event
 
 # How similar two event categories are, for picking analogs
 RELATED = {
-    frozenset({"typhoon", "storm"}): 0.7, frozenset({"typhoon", "flood"}): 0.5, frozenset({"storm", "flood"}): 0.5,
+    frozenset({"typhoon", "storm"}): 0.7, frozenset({"tsunami", "typhoon"}): 0.3, frozenset({"tsunami", "storm"}): 0.3,
+    frozenset({"tsunami", "flood"}): 0.4, frozenset({"typhoon", "flood"}): 0.5, frozenset({"storm", "flood"}): 0.5,
     frozenset({"fab_fire_outage", "earthquake"}): 0.4, frozenset({"fab_fire_outage", "storm"}): 0.4,
     frozenset({"conflict", "export_control"}): 0.4, frozenset({"shipping_chokepoint", "logistics_shutdown"}): 0.7,
     frozenset({"shipping_chokepoint", "conflict"}): 0.5, frozenset({"typhoon", "shipping_chokepoint"}): 0.4,

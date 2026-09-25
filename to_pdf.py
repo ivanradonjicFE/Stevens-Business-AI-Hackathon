@@ -12,7 +12,7 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import (HRFlowable, KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table,
+from reportlab.platypus import (HRFlowable, KeepTogether, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table,
                                 TableStyle)
 
 INK, MUTED, RULE, HEAD_BG = colors.HexColor("#1b1f24"), colors.HexColor("#5b6470"), colors.HexColor("#d5dae0"), colors.HexColor("#f1f3f5")
@@ -28,6 +28,7 @@ S = {
     "meta": ParagraphStyle("m", parent=ss["BodyText"], fontSize=8.2, leading=11, textColor=MUTED),
     "bullet": ParagraphStyle("bl", parent=ss["BodyText"], fontSize=8.5, leading=11.5, leftIndent=10, bulletIndent=0, textColor=INK),
     "audit": ParagraphStyle("a", parent=ss["BodyText"], fontSize=7.6, leading=10, leftIndent=10, bulletIndent=0, textColor=MUTED),
+    "score": ParagraphStyle("sc", parent=ss["BodyText"], fontSize=13, leading=17, spaceBefore=2, spaceAfter=6),
     "cell": ParagraphStyle("c", parent=ss["BodyText"], fontSize=7.6, leading=9.6, textColor=INK),
     "cellh": ParagraphStyle("ch", parent=ss["BodyText"], fontSize=7.6, leading=9.6, textColor=INK, fontName="Helvetica-Bold"),
 }
@@ -43,9 +44,17 @@ def inline(text: str, color_pct: bool = False) -> str:
 
 
 def table(rows: list[list[str]], width: float) -> Table:
-    ncol = len(rows[0])
-    # Precedent tables have a long last column; reaction tables are label + numbers
-    widths = {7: [1.0, 0.82, 0.46, 0.5, 0.52, 2.15, 1.95], 6: [1.35, 0.72, 0.55, 0.6, 0.62, 3.26]}.get(ncol, [2.0, 1.9, 1.3, 1.3])
+    ncol, head = len(rows[0]), [c.strip("* ") for c in rows[0]]
+    by_header = {  # (first header, column count) -> relative widths
+        ("Level", 8): [0.75, 1.9, 0.75, 0.75, 0.9, 1.15, 0.7, 0.7],
+        ("Block", 4): [2.4, 1.8, 1.0, 0.8],
+        ("Site", 4): [2.8, 1.2, 1.0, 0.8],
+        ("Event", 6): [2.3, 0.85, 0.6, 0.75, 0.8, 1.3],
+        ("Ticker", 3): [2.6, 2.0, 1.4],
+        ("Segment", 4): [0.9, 1.2, 0.85, 4.1],
+        ("Event", 7): [1.0, 0.82, 0.46, 0.5, 0.52, 2.15, 1.95],
+    }
+    widths = by_header.get((head[0], ncol)) or {6: [1.35, 0.72, 0.55, 0.6, 0.62, 3.26]}.get(ncol) or [2.0] + [1.3] * (ncol - 1)
     scale = width / sum(widths)
     data = [[Paragraph(inline(c, color_pct=r > 0).replace(" • ", "<br/>• "), S["cellh" if r == 0 else "cell"])
              for c in row] for r, row in enumerate(rows)]
@@ -82,7 +91,9 @@ def build(md_path: Path) -> Path:
         flush_table()
         if not line:
             continue
-        if line.startswith("<details>"):
+        if line == "<pagebreak>":
+            story.append(PageBreak())
+        elif line.startswith("<details>"):
             in_audit = True
             story.append(Paragraph("How we scored this", S["h3"]))
         elif line.startswith("</details>"):
@@ -91,19 +102,26 @@ def build(md_path: Path) -> Path:
             story += [Paragraph(inline(line[2:]), S["title"]), HRFlowable(width="100%", color=RULE, thickness=0.8)]
         elif line.startswith("## "):
             head = inline(line[3:])
-            m = re.match(r"(\d+\.) \[(\w+)\] (.*)", line[3:])
+            m = re.match(r"(\d+\. )?\[(\w+)\] (.*)", line[3:])
             if m:
                 c = LEVEL_COLOR.get(m[2], "#5b6470")
-                head = f'{m[1]} <font color="{c}">[{m[2]}]</font> {inline(m[3])}'
+                head = f'{m[1] or ""}<font color="{c}">[{m[2]}]</font> {inline(m[3])}'
             story.append(KeepTogether([Spacer(1, 4), HRFlowable(width="100%", color=RULE, thickness=0.5),
                                        Paragraph(head, S["h2"])]))
+        elif line.startswith("### "):
+            in_audit = line[4:].strip() == "How we scored this"  # small muted bullets for the audit section
+            story.append(Paragraph(inline(line[4:]), S["h3"]))
+        elif re.fullmatch(r"\*\*\d+ / 100 - (GREEN|ORANGE|RED)\*\*", line):  # WDI score line
+            band = line.strip("*").split()[-1]
+            c = {"GREEN": "#2e7d32", "ORANGE": "#d97706", "RED": "#c62828"}[band]
+            story.append(Paragraph(f'<font color="{c}"><b>{line.strip("*")}</b></font>', S["score"]))
         elif line == "---":
             story += [Spacer(1, 8), HRFlowable(width="100%", color=RULE, thickness=0.5), Spacer(1, 4)]
         elif line.startswith("- "):
             story.append(Paragraph(inline(line[2:]), S["audit" if in_audit else "bullet"], bulletText="•"))
         elif re.fullmatch(r"\*\*[^*]+\*\*( \(.*\))?", line):  # section label like **What's exposed**
             story.append(Paragraph(inline(line), S["h3"]))
-        elif line.startswith("**Source:**") or line.startswith("**Relevance"):
+        elif line.startswith("**Source:**"):
             story.append(Paragraph(inline(line), S["meta"]))
         else:
             story.append(Paragraph(inline(line, color_pct=False), S["body"]))
