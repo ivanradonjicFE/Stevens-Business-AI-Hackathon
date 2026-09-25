@@ -15,10 +15,10 @@ Scoring is framed as an insurance CAT model:
   - Vulnerability = sector-resilience proxy per the market lens
                   (how fast the hit translates to insured loss)
 
-Outlook is a *projection*: similarity-weighted insured-loss estimate
-from analog case files, scaled by severity ratio (current / analog,
-capped 0.33-1.5) — the same heuristic as the reference report.
-Crossing the PCS $25M insured-loss threshold earns a CAT designation.
+Outlook is a *projection*: match-weighted mean of documented insured
+losses from analog case files — no severity scaling; every dollar
+traces to a named case file. Crossing the PCS $25M insured-loss
+threshold earns a CAT designation.
 """
 
 from __future__ import annotations
@@ -401,8 +401,8 @@ def render(scenario: str, market_key: str, event: EventCluster) -> str:
     )
     L.append(
         "- Analogs picked by mechanism/sector/geo similarity; projected "
-        "loss = match-weighted mean of documented analog losses, scaled "
-        "by severity ratio (capped 0.33–1.5×)."
+        "loss = match-weighted mean of documented analog losses — no "
+        "severity scaling; every dollar traces to a named case file."
     )
     L.append(
         "- Caveat: automated early-warning signal, not underwriting "
