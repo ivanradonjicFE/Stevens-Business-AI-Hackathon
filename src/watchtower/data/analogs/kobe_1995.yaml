@@ -1,0 +1,33 @@
+id: kobe_1995
+name: Great Hanshin (Kobe) earthquake
+date: 1995-01-17
+duration_days: 90
+region: [34.69, 135.20]
+report_region: asia
+mechanisms: [seismic, infrastructure, chokepoint, shipping_delay]
+sectors_hit: [autos, electronics, container_shipping, retail]
+summary: >-
+  A magnitude ~6.9 earthquake struck near Kobe, killing more than 6,000
+  people and destroying port infrastructure: Kobe was then Japan's
+  busiest container port and a large share of its berths were put out of
+  action for months. Electronics and automotive plants across the
+  Hanshin industrial belt stopped for weeks while power, water and road
+  links were restored; some production was shifted to other regions.
+market_reaction:
+  index_move: "Limited broad-market reaction (pre-globalisation of supply chains); regional industrial output fell sharply"
+  spot_prices: "Import/export congestion shifted to Osaka and other ports; freight costs rose locally"
+  lead_time_delta: "+weeks for components routed through Hanshin plants"
+quantified_impact:
+  port_capacity: "Kobe's container berths largely unusable for months (reconstruction took years)"
+  casualties: ">6,000 deaths; widespread building and infrastructure collapse"
+  insurance: "Largest earthquake loss on record at the time, driven by property and marine exposure"
+sources:
+  - title: "Kobe earthquake: 1995 disaster that reshaped Japanese infrastructure"
+    url: "https://www.bbc.com"
+  - title: "Hanshin Expressway collapse and port damage assessment"
+    url: "https://www.reuters.com"
+lessons: >-
+  Ports and road/rail links fail together in a quake: it is the
+  logistics corridor, not just the plants, that determines outage
+  length. Single-port concentration on one coast is itself a chokepoint
+  risk.

@@ -1,0 +1,32 @@
+id: eyjafjallajokull_2010
+name: Eyjafjallajokull ash cloud airspace closure
+date: 2010-04-14
+duration_days: 14
+region: [63.63, -19.62]
+report_region: europe
+mechanisms: [extreme_weather, shipping_delay, chokepoint, materials_shortage]
+sectors_hit: [electronics, autos, pharma, retail]
+summary: >-
+  Ash from the Eyjafjallajokull eruption closed large parts of European
+  airspace in April 2010, cancelling on the order of 100,000 flights.
+  The semiconductor and electronics industry depends on air freight for
+  high-value, time-critical components (wafers, tools, spares), so
+  grounded airfreight added days to deliveries and forced some
+  production rescheduling.
+market_reaction:
+  index_move: "Airline shares fell sharply; industrial impact largely a logistics story rather than a demand shock"
+  spot_prices: "Airfreight rates and charter demand spiked; road/sea substitution absorbed part of the load"
+  lead_time_delta: "+3-7 days for air-freighted components across Europe"
+quantified_impact:
+  flights_cancelled: "~100,000 flights cancelled over the closure period"
+  airfreight: "Europe-bound air cargo capacity effectively cut for ~a week"
+  insurance: "Aviation, cargo delay and business-interruption claims; volcanic ash exclusions reviewed"
+sources:
+  - title: "Volcanic ash cloud: Europe's airspace shutdown"
+    url: "https://www.bbc.com"
+  - title: "Ash cloud cost airlines billions, IATA says"
+    url: "https://www.reuters.com"
+lessons: >-
+  Air freight is an unhedged dependency of high-value electronics.
+  Natural-hazard events far from "chip country" can still hit chip
+  logistics, and substituting air for sea adds weeks, not days.

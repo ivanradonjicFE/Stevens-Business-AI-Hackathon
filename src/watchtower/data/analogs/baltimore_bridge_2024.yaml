@@ -1,0 +1,31 @@
+id: baltimore_bridge_2024
+name: Baltimore Key Bridge collapse — port channel closure
+date: 2024-03-26
+duration_days: 80
+region: [39.20, -76.53]
+report_region: north_america
+mechanisms: [infrastructure, chokepoint, shipping_anomaly, shipping_delay]
+sectors_hit: [container_shipping, autos, retail, energy]
+summary: >-
+  A container ship lost power and struck the Francis Scott Key Bridge in
+  Baltimore, collapsing it and blocking the main shipping channel. The
+  port handles a large share of US vehicle imports and exports plus
+  specialised cargo, so the closure forced diversions to other East
+  Coast ports and reworked automotive logistics.
+market_reaction:
+  index_move: "Localised: automaker and port-adjacent logistics costs rose; broad market unaffected"
+  spot_prices: "Vehicle and specialised cargo handling diverted; inland trucking costs increased"
+  lead_time_delta: "+1-3 weeks for cargo normally routed through Baltimore"
+quantified_impact:
+  port_closure: "Main channel blocked until debris clearance; limited barge traffic restored first"
+  cargo: "Roll-on/roll-off vehicle imports and specialised cargo diverted to other ports"
+  insurance: "Marine, property, BI and liability claims; bridge and cargo losses contested"
+sources:
+  - title: "Baltimore bridge collapse halts shipping in the port"
+    url: "https://www.reuters.com"
+  - title: "Key Bridge collapse: port traffic diverted"
+    url: "https://apnews.com"
+lessons: >-
+  A single structure can close a port. Ro-ro and specialised cargo have
+  fewer diversion options than containers, which is why the automotive
+  channel is usually the first to feel it.

@@ -1,0 +1,48 @@
+# Free, keyless news sources for the live sitrep and dashboard.
+#
+# Everything here needs no account and no API key, so a demo can run on
+# whatever network it is given.
+#
+# feeds:   publisher RSS/Atom endpoints, shared across markets. `credibility`#          is the source-reliability prior the severity rubric uses - a trade
+#          journal is not a wire service, so this sits well below a government
+#          advisory (0.9+) on purpose.
+# queries: per-market search terms. These are run through GDELT and through
+#          Google News RSS (keyless but *unofficial*: it is one source among
+#          several, never the only one).
+#
+# Adding a source means adding a row here - no code change.
+
+feeds:
+  # --- logistics / maritime trade press (logistics-leaning) ---
+  - name: gCaptain
+    url: "https://gcaptain.com/feed/"
+    source_type: trade_press
+    credibility: 0.60
+  - name: The Loadstar
+    url: "https://theloadstar.com/feed/"
+    source_type: trade_press
+    credibility: 0.60
+  - name: Splash247
+    url: "https://splash247.com/feed/"
+    source_type: trade_press
+    credibility: 0.55
+  # --- chip manufacturing trade press ---
+  - name: SemiEngineering
+    url: "https://semiengineering.com/feed/"
+    source_type: trade_press
+    credibility: 0.60
+
+queries:
+  semicon:
+    - "TSMC OR foundry OR wafer capacity"
+    - "semiconductor shortage OR outage OR disruption"
+    - "chip export controls OR sanctions"
+    - "HBM OR advanced packaging supply"
+  auto:
+    - "auto parts shortage OR plant shutdown"
+    - "semiconductor shortage automotive"
+    - "port disruption vehicle shipping"
+  energy:
+    - "refinery outage OR LNG disruption"
+    - "Strait of Hormuz OR Red Sea shipping"
+    - "pipeline outage OR power grid disruption"

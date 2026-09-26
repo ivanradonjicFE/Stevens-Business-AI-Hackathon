@@ -1,0 +1,31 @@
+id: malaysia_lockdown_2021
+name: Malaysia COVID-19 lockdown — assembly and test squeeze
+date: 2021-06-01
+duration_days: 75
+region: [5.35, 100.30]
+report_region: asia
+mechanisms: [pandemic, materials_shortage, labor_disruption, shipping_delay]
+sectors_hit: [electronics, autos, container_shipping]
+summary: >-
+  Malaysia's national lockdown restricted staffing at electronics
+  assembly and test plants in Penang, Kulim and surrounding clusters.
+  Because Malaysia hosts a large share of global assembly, test and
+  passive-component capacity, effective output fell sharply while
+  global chip demand was surging, deepening the 2021 shortage.
+market_reaction:
+  index_move: "Deepened the 2021 chip shortage narrative; automotive production cuts widened"
+  spot_prices: "Component lead times extended to record levels; brokers saw sharp spot premiums"
+  lead_time_delta: "+8-20 weeks on many passive and assembly-test constrained parts"
+quantified_impact:
+  capacity: "Staffing limits cut throughput across assembly, test and component sites"
+  supply_chain: "Automakers idled lines and parked incomplete vehicles awaiting chips"
+  insurance: "Trade credit and contingent business interruption exposure followed the shortage"
+sources:
+  - title: "Malaysia lockdown worsens global chip shortage"
+    url: "https://www.reuters.com"
+  - title: "Chip shortage: how Malaysia became a global pinch point"
+    url: "https://www.bloomberg.com"
+lessons: >-
+  Assembly, test and passive components are as systemically important as
+  fabs and rarely get the same monitoring. Labour constraints are a
+  capacity constraint, and recover far slower than the headline policy.

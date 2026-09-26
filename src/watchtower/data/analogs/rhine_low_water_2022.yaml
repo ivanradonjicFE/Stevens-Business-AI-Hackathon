@@ -1,0 +1,31 @@
+id: rhine_low_water_2022
+name: Rhine low water — inland barge capacity cut
+date: 2022-08-01
+duration_days: 60
+region: [50.00, 7.50]
+report_region: europe
+mechanisms: [drought, extreme_weather, shipping_delay, materials_shortage]
+sectors_hit: [electronics, energy, retail]
+summary: >-
+  A summer drought dropped the Rhine to critically low levels, forcing
+  barges to sail at a fraction of normal load. Chemical, glass and
+  industrial gas producers along the river, including sites feeding
+  semiconductor supply chains such as specialty gas and precursor
+  plants, cut output or shifted to road and rail at much higher cost.
+market_reaction:
+  index_move: "European industrial names flagged input-cost pressure; broad indices barely moved"
+  spot_prices: "Barge freight rates spiked; road/rail substitution and chemicals surcharges followed"
+  lead_time_delta: "+weeks for river-dependent inputs"
+quantified_impact:
+  barge_loading: "Draft limits cut effective inland cargo capacity sharply"
+  industry: "Chemical and specialty-gas producers curtail output; inventories drawn down"
+  insurance: "BI and cargo claims limited but input-cost exposure broad"
+sources:
+  - title: "Low Rhine levels hit German industry"
+    url: "https://www.reuters.com"
+  - title: "Drought forces barges to cut loads on the Rhine"
+    url: "https://www.bbc.com"
+lessons: >-
+  Inland waterways are invisible chokepoints. Semiconductor exposure
+  arrives through specialty chemicals and gases rather than through the
+  famous coastal routes.

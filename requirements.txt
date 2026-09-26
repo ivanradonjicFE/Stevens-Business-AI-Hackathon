@@ -1,0 +1,7 @@
+requests
+yfinance
+pandas
+certifi
+reportlab
+openai
+matplotlib

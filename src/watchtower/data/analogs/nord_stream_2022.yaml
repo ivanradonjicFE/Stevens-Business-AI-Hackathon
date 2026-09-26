@@ -1,0 +1,31 @@
+id: nord_stream_2022
+name: Nord Stream pipeline sabotage
+date: 2022-09-26
+duration_days: 180
+region: [55.30, 15.50]
+report_region: europe
+mechanisms: [geopolitical, infrastructure, chokepoint, market_reaction]
+sectors_hit: [energy, electronics, retail]
+summary: >-
+  Explosions ruptured the Nord Stream 1 and 2 pipelines in the Baltic
+  Sea, ending any near-term prospect of Russian gas flows through them.
+  Coming after the 2022 invasion of Ukraine, the event locked in high
+  European energy costs, which feed directly into fab operating costs,
+  chemicals, glass and industrial production.
+market_reaction:
+  index_move: "European energy prices elevated; industrial energy-cost sensitivity re-rated"
+  spot_prices: "Gas and power prices at multiples of historic norms through the winter"
+  lead_time_delta: "Indirect: energy-intensive input costs and curtailment risk"
+quantified_impact:
+  energy_supply: "Pipeline route permanently disrupted; capacity idled"
+  industry: "Energy-intensive European manufacturing reviewed output and considered curtailment"
+  insurance: "Subsea infrastructure and BI claims; political-risk coverage in focus"
+sources:
+  - title: "Nord Stream leaks: sabotage suspected after pressure drops"
+    url: "https://www.bbc.com"
+  - title: "Europe races to secure gas supply after pipeline damage"
+    url: "https://www.reuters.com"
+lessons: >-
+  Energy is an input to every node on the map. Subsea and cross-border
+  infrastructure has no quick repair path, so the risk is duration, and
+  duration is what budgets and insurance programmes get wrong.

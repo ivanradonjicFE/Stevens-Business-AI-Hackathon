@@ -5,6 +5,9 @@ __pycache__/
 dist/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+.env
+Open_AI_API_Key.txt
 .devin/
 sitreps/*.pdf
 *.pdf

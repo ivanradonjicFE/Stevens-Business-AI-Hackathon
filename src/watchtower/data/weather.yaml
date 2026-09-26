@@ -1,0 +1,38 @@
+# Free, keyless weather thresholds for the early-detection path.
+#
+# A forecast only becomes a signal when it crosses one of these. That gate is
+# the whole point: Open-Meteo answers for any coordinate on earth, so a
+# permissive threshold would fill the correlator with weather noise and drown
+# the real supply-chain signals. Tune these against the archived replays, where
+# the ground truth is known.
+#
+# Units are Open-Meteo defaults: km/h and mm.
+
+#: How far ahead a forecast is worth acting on.
+horizon_days: 3
+
+#: How far back the river baseline looks before a level counts as "low".
+river_baseline_days: 92
+
+#: Percentile of that baseline that counts as low water. Relative, not
+#: absolute, because GloFAS discharge varies by orders of magnitude between
+#: catchments - this is what lets one rule serve both the Rhine and the
+#: Panama Canal without per-river calibration.
+river_low_percentile: 10
+
+#: Median flow (m3/s) below which a grid cell is not a river we can reason
+#: about. GloFAS answers for every coordinate, so cells that sit on a canal,
+#: a sea or dry ground come back as a flat ~0 series - and a flat series
+#: passes *any* percentile test, which produced bogus "low water at Suez
+#: Canal" signals. Measured medians: Suez 0.0, Ceyhan 0.0, Busan 0.1,
+#: Singapore 2.0, Panama 2.1, Spruce Pine 4.2, Shanghai 1689.
+river_min_discharge: 1.0
+
+thresholds:
+  #: Sustained winds that idle cranes, ports and fabs.
+  wind_kmh: 90
+  gust_kmh: 130
+  rain_mm_24h: 80
+  #: Air temperature extremes (fabs are temperature-sensitive).
+  heat_c: 40
+  cold_c: -15

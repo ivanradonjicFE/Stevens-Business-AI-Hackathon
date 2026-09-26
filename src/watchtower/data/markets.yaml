@@ -1,11 +1,25 @@
 # Market verticals. Semiconductor is fully built; others demonstrate
 # that the pipeline is config-driven and extensible.
+#
+# watchlist: every name monitored for the vertical (shown when a panel
+#            is too short for the full segment breakdown).
+# segments:  the same names grouped by supply-chain role, which is what
+#            the dashboard watchlist panel renders.
 
 markets:
   semicon:
     label: Semiconductor
     index: SOX
-    watchlist: [NVDA, TSM, ASML, AMD, MU, NXPI, AVGO, QCOM, INTC, TXN, AMAT, LRCX, KLAC, "ON", STM, MCHP]
+    watchlist: [NVDA, TSM, ASML, AMD, MU, NXPI, AVGO, QCOM, INTC, TXN, AMAT, LRCX, KLAC, "ON", STM, MCHP, ADI, MRVL, ARM, SNPS, CDNS, TER, ENTG, ASX, UMC, GFS, SMCI, SWKS, MPWR, WOLF]
+    segments:
+      foundry: [TSM, UMC, GFS, INTC]
+      logic: [NVDA, AMD, AVGO, QCOM, MRVL, ARM, NXPI, MCHP, MPWR, SWKS, WOLF, STM, "ON"]
+      analog: [ADI, TXN]
+      memory: [MU]
+      equipment: [ASML, AMAT, LRCX, KLAC, TER, ENTG]
+      eda: [SNPS, CDNS]
+      packaging: [ASX]
+      systems: [SMCI]
     node_kinds: [fab, canal, strait, port, material, osat]
     mechanisms:
       - canal_blockage
@@ -22,7 +36,11 @@ markets:
   auto:
     label: Automotive
     index: S&P500 Auto
-    watchlist: [TM, F, GM, TSLA, RIVN, STLA, HMC, APTV, MGA, BWA, LKQ, ALV, LEAR, VLEEY]
+    watchlist: [TM, F, GM, TSLA, RIVN, STLA, HMC, APTV, MGA, BWA, LKQ, ALV, LEAR, VLEEY, PCAR, OSK, GNTX, VC, MOD, QS]
+    segments:
+      oem: [TM, F, GM, TSLA, STLA, HMC, RIVN, PCAR, OSK]
+      suppliers: [APTV, MGA, BWA, ALV, LEAR, GNTX, VC, MOD, LKQ, VLEEY]
+      ev: [TSLA, RIVN, QS]
     node_kinds: [fab, port, canal, strait]
     mechanisms:
       - shipping_anomaly
@@ -33,7 +51,13 @@ markets:
   energy:
     label: Energy
     index: XLE
-    watchlist: [XOM, CVX, SLB, LNG, COP, EOG, MPC, VLO, PSX, OXY, HAL, BKR, TTE, SHEL]
+    watchlist: [XOM, CVX, SLB, LNG, COP, EOG, MPC, VLO, PSX, OXY, HAL, BKR, TTE, SHEL, KMI, WMB, ET, EPD, TRGP, FANG, DVN, CTRA]
+    segments:
+      majors: [XOM, CVX, TTE, SHEL, OXY]
+      services: [SLB, HAL, BKR]
+      midstream: [KMI, WMB, ET, EPD, TRGP, LNG]
+      downstream: [MPC, VLO, PSX]
+      e_and_p: [COP, EOG, FANG, DVN, CTRA]
     node_kinds: [strait, canal, port]
     mechanisms:
       - geopolitical

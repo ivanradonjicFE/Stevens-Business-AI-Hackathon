@@ -1,0 +1,31 @@
+id: taiwan_hualien_2024
+name: Hualien earthquake (Taiwan)
+date: 2024-04-03
+duration_days: 14
+region: [23.82, 121.71]
+report_region: taiwan
+mechanisms: [seismic, fab_shutdown, shipping_delay]
+sectors_hit: [electronics, autos, container_shipping]
+summary: >-
+  A magnitude 7.4 earthquake off Hualien was the strongest in Taiwan in a
+  quarter century. Science parks evacuated staff and halted tools for
+  inspection; foundries reported limited wafer damage and resumed output
+  within days. Port and road links on the east coast were disrupted
+  longer than the fabs.
+market_reaction:
+  index_move: "Limited move where production resumed quickly; risk premium concentrated in Taiwan-exposed names"
+  spot_prices: "No sustained pricing impact; lead-time watch on advanced nodes"
+  lead_time_delta: "+days to +2 weeks depending on line"
+quantified_impact:
+  fab_outages: "Brief fab stoppages for inspection; in-process wafer losses reported as limited"
+  infrastructure: "Highway and rail damage on the east coast; Hualien port disrupted"
+  insurance: "Property and BI claims concentrated in the epicentral region"
+sources:
+  - title: "Taiwan earthquake: chipmakers evacuate, production resumes"
+    url: "https://www.reuters.com"
+  - title: "Hualien quake damage assessment"
+    url: "https://www.bbc.com"
+lessons: >-
+  Preparedness compresses recovery: Taiwan fabs restart in days where
+  other regions take weeks. But concentration risk remains — the same
+  geology sits under a very large share of advanced-node capacity.

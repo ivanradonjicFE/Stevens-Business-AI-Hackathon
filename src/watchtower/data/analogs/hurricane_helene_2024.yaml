@@ -1,0 +1,32 @@
+id: hurricane_helene_2024
+name: Hurricane Helene — Spruce Pine quartz flooding
+date: 2024-09-26
+duration_days: 60
+region: [35.92, -82.07]
+report_region: north_america
+mechanisms: [flood, extreme_weather, materials_shortage, chokepoint]
+sectors_hit: [electronics, container_shipping, retail]
+summary: >-
+  Hurricane Helene brought catastrophic flooding to western North
+  Carolina, including the Spruce Pine district that supplies most of the
+  world's high-purity quartz used in semiconductor crucibles and quartz
+  ware. Mining and processing operations halted, power and roads were
+  destroyed, and the main interstate link through the mountains was
+  closed for an extended period.
+market_reaction:
+  index_move: "Little immediate index reaction; the exposure was framed as a future input-risk to wafer fabrication"
+  spot_prices: "High-purity quartz and crucible supply watched; existing inventories absorbed near-term demand"
+  lead_time_delta: "+weeks of uncertainty on quartz feedstock availability"
+quantified_impact:
+  operations: "Quartz mining and processing suspended across the district"
+  infrastructure: "I-40 corridor and local roads badly damaged; power and water outages for weeks"
+  insurance: "Very large flood and wind property losses; business-interruption exposure across the region"
+sources:
+  - title: "Hurricane Helene devastates Spruce Pine, a linchpin of chipmaking"
+    url: "https://www.reuters.com"
+  - title: "Spruce Pine quartz: the supply chain's quiet single point of failure"
+    url: "https://www.bloomberg.com"
+lessons: >-
+  Material chokepoints concentrate in single small towns. Substitute
+  capacity cannot be switched on in weeks, so the real variable is
+  inventory buffer depth across crucible makers and fabs.

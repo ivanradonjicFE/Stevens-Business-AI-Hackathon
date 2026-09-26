@@ -1,0 +1,31 @@
+id: red_sea_shipping_2023
+name: Red Sea attacks — Bab el-Mandeb rerouting
+date: 2023-12-15
+duration_days: 365
+region: [12.58, 43.33]
+report_region: middle_east
+mechanisms: [geopolitical, shipping_anomaly, chokepoint, shipping_delay, canal_blockage]
+sectors_hit: [container_shipping, energy, electronics, retail]
+summary: >-
+  Attacks on commercial shipping in the southern Red Sea led major
+  carriers to suspend Bab el-Mandeb transits and route Asia-Europe
+  services around the Cape of Good Hope. Suez Canal transits fell
+  sharply, effective voyage length rose by roughly 10-14 days, and
+  container spot rates on Asia-Europe lanes rose several-fold.
+market_reaction:
+  index_move: "Shipping equities rallied on higher rates; import-dependent retail faced cost pressure"
+  spot_prices: "Asia-Europe container spot rates up multiples versus pre-disruption levels"
+  lead_time_delta: "+10-14 days round the Cape, with schedule reliability degrading"
+quantified_impact:
+  canal_transits: "Suez transits down sharply year-on-year as carriers diverted"
+  voyage_cost: "Higher fuel and charter costs; effective fleet capacity absorbed by longer routes"
+  insurance: "War-risk premiums for Red Sea transits rose sharply; some underwriters restricted cover"
+sources:
+  - title: "Shipping giants divert away from the Red Sea"
+    url: "https://www.reuters.com"
+  - title: "Cape rerouting adds days and cost to Asia-Europe trade"
+    url: "https://lloydslist.com"
+lessons: >-
+  Chokepoint risk transmits through schedules and rates long before it
+  transmits through prices of finished goods. War-risk insurance and
+  freight contracts reprice faster than supply chains can reroute.

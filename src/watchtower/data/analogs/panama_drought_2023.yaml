@@ -1,0 +1,31 @@
+id: panama_drought_2023
+name: Panama Canal drought — transit slot rationing
+date: 2023-08-01
+duration_days: 365
+region: [9.08, -79.68]
+report_region: north_america
+mechanisms: [drought, extreme_weather, chokepoint, shipping_delay, canal_blockage]
+sectors_hit: [container_shipping, energy, retail, electronics]
+summary: >-
+  An El Nino-driven drought cut water levels in Gatun Lake, so the
+  Panama Canal Authority rationed daily transits and reduced maximum
+  draft. Waiting times and auction prices for slots rose, and some
+  carriers rerouted Asia-US East Coast cargo via Suez or the US West
+  Coast with rail onward.
+market_reaction:
+  index_move: "Limited index impact; freight rate and schedule effects concentrated in affected lanes"
+  spot_prices: "Slot auction prices and container rates on affected routes rose; US East Coast imports re-routed"
+  lead_time_delta: "+1-2 weeks plus schedule uncertainty"
+quantified_impact:
+  transits: "Daily booking slots cut materially versus normal capacity"
+  draft: "Maximum draft reduced, cutting cargo per transit"
+  insurance: "Cargo delay and BI exposure where delivery windows were contractual"
+sources:
+  - title: "Panama Canal restricts transits as drought bites"
+    url: "https://www.reuters.com"
+  - title: "Drought forces Panama Canal to cut shipping slots"
+    url: "https://www.bbc.com"
+lessons: >-
+  Climate risk on a chokepoint is slow and cumulative, not sudden:
+  rationing signals arrive early and last for months. Weather-scoped
+  monitoring has to look at watersheds, not just storms.

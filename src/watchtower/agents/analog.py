@@ -15,7 +15,7 @@ from datetime import UTC, datetime
 from watchtower.geo import haversine_km
 from watchtower.models import Analog, EventCluster
 
-TOP_N = 3
+TOP_N = 4  # matches surfaced per event (history is the payload)
 GEO_DECAY_KM = 8000.0
 
 W_MECHANISM = 0.55

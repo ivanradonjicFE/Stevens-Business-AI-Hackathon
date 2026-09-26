@@ -24,17 +24,21 @@ threshold earns a CAT designation.
 from __future__ import annotations
 
 import argparse
-import math
 import re
 import shutil
 import subprocess
-from collections import Counter
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from watchtower.agents.orchestrator import Orchestrator
 from watchtower.config import REPLAY_DIR, SCENARIO_EXCLUSIONS, load_markets
 from watchtower.models import Analog, EventCluster, Severity
+from watchtower.relevance import lexical_relevance
+from watchtower.report import council_rows, early_indicator_rows, rank_forecasts
 from watchtower.sources import replay_signals
+
+if TYPE_CHECKING:
+    from watchtower.agents.council import CouncilReport
 
 PCS_THRESHOLD_USD = 25_000_000
 
@@ -95,54 +99,14 @@ def _vulnerability_score(event: EventCluster) -> float:
     )
 
 
-def _tokenize(text: str) -> list[str]:
-    return re.findall(r"[a-z0-9]+", text.lower())
-
-
-def _cosine(a: Counter, b: Counter) -> float:
-    num = sum(a[t] * b.get(t, 0) for t in a)
-    da = math.sqrt(sum(v * v for v in a.values()))
-    db = math.sqrt(sum(v * v for v in b.values()))
-    return num / (da * db) if da and db else 0.0
-
-
 def _cosine_relevance(event: EventCluster, market_key: str) -> float:
-    """Cosine similarity between event text and market-context docs.
+    """Lexical relevance of an event to a market lens (see watchtower.relevance).
 
-    Each signal is a document; the market context document is built from
-    the vertical's watchlist, node kinds, mechanism vocabulary, and the
-    names of every chokepoint node type in that vertical. The event's
-    relevance is the credibility-weighted mean cosine of its top-10
-    most-credible signals against the context doc.
+    Delegates to the canonical implementation so the printed score is
+    reproducible from the live ``markets.yaml`` and cannot drift from the
+    copy the agents use.
     """
-    spec = load_markets()[market_key]
-    context_terms = (
-        list(spec.watchlist)
-        + sorted(spec.node_kinds)
-        + sorted(spec.mechanisms)
-        + spec.label.split()
-    )
-    # enrich: canonical vocabulary for each node kind
-    vocab = {
-        "fab": "semiconductor fab chip wafer foundry",
-        "osat": "assembly test packaging",
-        "material": "neon quartz substrate palladium gas",
-        "canal": "canal shipping container vessel transit",
-        "strait": "strait shipping tanker vessel transit",
-        "port": "port cargo container shipping freight",
-    }
-    for kind in spec.node_kinds:
-        context_terms += vocab.get(kind, "").split()
-    ctx = Counter(_tokenize(" ".join(context_terms)))
-
-    top = sorted(event.signals, key=lambda s: s.credibility, reverse=True)[:10]
-    sims = [
-        _cosine(Counter(_tokenize(s.text + " " + " ".join(s.entities))), ctx)
-        for s in top
-    ]
-    wsum = sum(s.credibility for s in top) or 1.0
-    rel = sum(sim * s.credibility for sim, s in zip(sims, top)) / wsum
-    return round(min(1.0, rel * 3.0), 2)  # scale: raw TF cosine is small
+    return lexical_relevance(event, load_markets()[market_key])
 
 
 def _parse_usd(text: str) -> float | None:
@@ -199,7 +163,28 @@ def _projected_loss(
     return est, rows
 
 
-def render(scenario: str, market_key: str, event: EventCluster) -> str:
+def _nearest_forecasts(
+    event: EventCluster, signals: list, limit: int = 12
+) -> list:
+    """Forecasts for the early-indicator table, nearest the event first.
+
+    A per-node forecast rarely forms an event on its own (the correlator wants
+    two signals), so scoping the table to the event's own signals would hide
+    the whole forecast lane. This draws from every live signal instead and
+    ranks by distance to the event, so a report about the Gulf still leads
+    with Gulf forecasts.
+    """
+    return rank_forecasts(event.centroid, signals, limit=limit)
+
+
+def render(
+    scenario: str,
+    market_key: str,
+    event: EventCluster,
+    council_report: CouncilReport | None = None,
+    early_signals: list | None = None,
+) -> str:
+    """Render the PIT report, with the AI council's read when one landed."""
     as_of = _as_of(event)
     hazard = event.severity_score
     exposure = _exposure_score(event)
@@ -261,6 +246,24 @@ def render(scenario: str, market_key: str, event: EventCluster) -> str:
 
     wdi = sev_score * vul_score
     band = "GREEN" if wdi < 30 else "ORANGE" if wdi < 60 else "RED"
+
+    # Forecasts lead the scoring: this is the only part of the page about what
+    # has not happened yet, and the only part that buys lead time.
+    pool = early_signals if early_signals is not None else event.signals
+    early = early_indicator_rows(pool)
+    if early:
+        L.append("### Early indicators (forecasts)")
+        L.append("")
+        L.extend(early)
+        L.append("")
+        L.append(
+            "*Projections, not observations: each row states the model and its "
+            "lead time, and carries a lower credibility prior (0.55) than an "
+            "authority alert. These are the forecasts nearest this event across "
+            "the live feed, not confirmed disruptions. US warnings (NWS) cover "
+            "the US only; GDACS/EONET/Open-Meteo are global.*"
+        )
+        L.append("")
 
     L.append("### Weather Disruption Index (WDI)")
     L.append("")
@@ -404,11 +407,21 @@ def render(scenario: str, market_key: str, event: EventCluster) -> str:
         "loss = match-weighted mean of documented analog losses — no "
         "severity scaling; every dollar traces to a named case file."
     )
+    provenance = (
+        "Live feeds are point-in-time as of the cutoff; projections are "
+        "analog-derived estimates, not observed outcomes."
+        if scenario.startswith("live")
+        else "Replay data is curated and point-in-time; projections are "
+        "analog-derived estimates, not observed outcomes."
+    )
     L.append(
         "- Caveat: automated early-warning signal, not underwriting "
-        "advice. Replay data is curated and point-in-time; projections "
-        "are analog-derived estimates, not observed outcomes."
+        f"advice. {provenance}"
     )
+    L.append("")
+    L.append("## AI council read")
+    L.append("")
+    L.extend(council_rows(council_report))
     L.append("")
     return "\n".join(L)
 
@@ -423,9 +436,22 @@ def main() -> None:
     parser.add_argument("--out", default="sitreps")
     parser.add_argument(
         "--source",
-        choices=["gdelt", "eonet"],
+        choices=[
+            "gdelt",
+            "news",
+            "weather",
+            "all",
+            "eonet",
+            "gdacs",
+            "usgs",
+            "tsunami",
+            "hazard",
+        ],
         default="gdelt",
-        help="live source: gdelt news (needs --live query) or eonet natural events",
+        help="live source: gdelt news (needs --live QUERY), news to run "
+        "every keyless news feed for --market (trade-press RSS + Google "
+        "News search), eonet natural events, a single hazard feed "
+        "(gdacs/usgs/tsunami), or hazard to run every hazard scout at once",
     )
     parser.add_argument(
         "--live",
@@ -449,7 +475,21 @@ def main() -> None:
         help="report on the event whose title contains this text "
         "(default: highest-severity cluster)",
     )
+    parser.add_argument(
+        "--council-timeout",
+        type=float,
+        default=90.0,
+        help="seconds to wait for the AI council's brief before writing "
+        "(0 disables; only applies when a model is reachable)",
+    )
     args = parser.parse_args()
+
+    # Live hazard scouts: authoritative disaster feeds (GDACS, USGS, the
+    # NOAA tsunami centres), or "hazard" to run them all and de-duplicate.
+    hazard_sources = ("gdacs", "usgs", "tsunami", "hazard")
+    # Keyless forecast sources: news needs no key, weather is Open-Meteo/GloFAS/
+    # NHC/NWS, "all" runs those plus the hazard scouts.
+    LIVE_SOURCES = ("news", "weather", "all")
 
     market = load_markets()[args.market]
     orch = Orchestrator(
@@ -457,15 +497,29 @@ def main() -> None:
         exclude_analogs=SCENARIO_EXCLUSIONS.get(args.scenario, frozenset()),
     )
 
-    if args.live or args.source == "eonet":
+    if (
+        args.live
+        or args.source == "eonet"
+        or args.source == "news"
+        or args.source in LIVE_SOURCES
+        or args.source in hazard_sources
+    ):
         if not args.asof:
-            raise SystemExit("--live/--source eonet requires --asof YYYYMMDDHHMMSS")
+            raise SystemExit(
+                f"--source {args.source} requires --asof YYYYMMDDHHMMSS (UTC)"
+            )
         from datetime import datetime as dt
         from datetime import timedelta
 
         end = args.asof
         start_dt = dt.strptime(end, "%Y%m%d%H%M%S")
         start = (start_dt - timedelta(days=args.window_days)).strftime("%Y%m%d%H%M%S")
+        # Every live branch needs the window in both conventions: ISO dates for
+        # the hazard/weather scouts, compact stamps for GDELT and the news feed.
+        window_start = (start_dt - timedelta(days=args.window_days)).strftime(
+            "%Y-%m-%d"
+        )
+        end_iso = start_dt.strftime("%Y-%m-%d")
         if args.source == "eonet":
             from watchtower.sources import eonet_signals
 
@@ -476,6 +530,59 @@ def main() -> None:
             signals = list(eonet_signals(start_iso, end_iso, limit=100))
             print(f"eonet: {len(signals)} PIT signals ({start_iso}..{end_iso})")
             args.scenario = args.scenario or "live_eonet"
+        elif args.source in hazard_sources:
+            from watchtower.sources import (
+                gdacs_signals,
+                hazard_signals,
+                noaa_tsunami_signals,
+                usgs_tsunami_signals,
+            )
+
+            if args.source == "gdacs":
+                # cyclones plus the other GDACS perils that idle fabs/ports
+                signals = list(
+                    gdacs_signals(
+                        window_start, end_iso, event_types=("TC", "TS", "FL")
+                    )
+                )
+            elif args.source == "usgs":
+                signals = list(usgs_tsunami_signals(end_iso))
+            elif args.source == "tsunami":
+                signals = list(
+                    noaa_tsunami_signals(end_iso, lookback_days=args.window_days)
+                )
+            else:
+                signals = list(hazard_signals(window_start, end_iso))
+            print(
+                f"{args.source}: {len(signals)} PIT signals "
+                f"({window_start}..{end_iso})"
+            )
+            args.scenario = args.scenario or f"live_{args.source}"
+        elif args.source in ("news", "all"):
+            from watchtower.sources import news_signals, weather_signals
+
+            news = list(news_signals(start, end, market_key=args.market))
+            weather = list(weather_signals(end=end, market_key=args.market))
+            if args.source == "news":
+                signals = news
+                print(f"news: {len(signals)} PIT signals ({start}..{end})")
+                args.scenario = args.scenario or "live_news"
+            else:
+                from watchtower.sources import hazard_signals
+
+                hazards = list(hazard_signals(window_start, end_iso))
+                signals = sorted(news + weather + hazards, key=lambda s: s.ts)
+                print(
+                    f"all: {len(signals)} PIT signals - news {len(news)} / "
+                    f"weather {len(weather)} / hazards {len(hazards)}"
+                )
+                args.scenario = args.scenario or "live_all"
+        elif args.source == "weather":
+            from watchtower.sources import weather_signals
+
+            signals = list(weather_signals(end=end, market_key=args.market))
+            print(f"weather: {len(signals)} PIT signals (cutoff {end})")
+            args.scenario = args.scenario or "live_weather"
         else:
             from watchtower.sources import gdelt_signals
 
@@ -506,12 +613,35 @@ def main() -> None:
     else:
         top = max(events, key=lambda e: e.severity_score)
 
-    md = render(args.scenario, args.market, top)
+    # Spend the token budget on the event this report is actually about rather
+    # than on whichever event the rationing happened to start first, and run
+    # it synchronously so the report never waits on the pool. The short drain
+    # afterwards just makes sure nothing is still in flight at exit, which
+    # would otherwise look like a hang.
+    council = orch.council
+    if council is not None and council.live and args.council_timeout > 0:
+        print(f"council: analysing {top.event_id} for the report...")
+        report = council.analyse_now(top)
+        council.wait(min(args.council_timeout, 15.0))
+        print(
+            f"council: {'landed' if report else 'no brief'} - "
+            f"{council.status_line()}"
+        )
+
+    md = render(
+        args.scenario,
+        args.market,
+        top,
+        council_report=orch.council_report(top.event_id),
+        early_signals=_nearest_forecasts(top, signals) or None,
+    )
     out_dir = Path(args.out)
     out_dir.mkdir(exist_ok=True)
     out = out_dir / f"sitrep_{args.scenario}.md"
     out.write_text(md)
     print(f"wrote {out}")
+    if orch.council is not None:
+        orch.close()
 
     if args.pdf:
         if not shutil.which("pandoc"):

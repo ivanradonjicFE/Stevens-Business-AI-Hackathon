@@ -1,0 +1,31 @@
+id: chennai_floods_2015
+name: Chennai floods (South India)
+date: 2015-11-15
+duration_days: 45
+region: [13.08, 80.27]
+report_region: asia
+mechanisms: [flood, extreme_weather, infrastructure, shipping_delay]
+sectors_hit: [autos, electronics, container_shipping]
+summary: >-
+  Record November-December rainfall flooded Chennai and its industrial
+  belt. Automotive and electronics plants including major
+  mobile-handset and component factories shut for days to weeks; the
+  airport flooded and closed, and the port handled reduced traffic while
+  roads and power were restored.
+market_reaction:
+  index_move: "Localised to exposed manufacturers; sector effect framed as temporary output loss"
+  spot_prices: "Handset and component supply tightened briefly; logistics costs rose"
+  lead_time_delta: "+1-3 weeks for output from affected plants"
+quantified_impact:
+  plant_outages: "Major auto and electronics plants idled during the flooding"
+  infrastructure: "Airport and rail closures; power and road disruption across the city"
+  insurance: "Large flood losses with heavy underinsurance in the industrial base"
+sources:
+  - title: "Chennai floods shutter factories and airport"
+    url: "https://www.bbc.com"
+  - title: "India floods hit auto and electronics output"
+    url: "https://www.reuters.com"
+lessons: >-
+  Urban flooding is a cluster-level event: many plants in one metro area
+  share the same drainage, power and road failure. Flood cover gaps in
+  industrial parks are a recurring loss driver.

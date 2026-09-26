@@ -1,0 +1,31 @@
+id: asml_berlin_fire_2022
+name: ASML Berlin factory fire
+date: 2022-01-03
+duration_days: 60
+region: [52.52, 13.40]
+report_region: europe
+mechanisms: [fire, infrastructure, materials_shortage, fab_shutdown]
+sectors_hit: [electronics, autos]
+summary: >-
+  A fire at ASML's Berlin site, which builds components for lithography
+  systems including wafer-clamp and measurement modules, damaged part of
+  the production area. The company said output of some modules would be
+  delayed, with the effect expected to be visible in system shipments
+  rather than immediately in revenue.
+market_reaction:
+  index_move: "Supplier shares moved on the news; sector impact was framed as a timing risk to tool deliveries"
+  spot_prices: "No direct price effect; equipment lead times are the transmission channel"
+  lead_time_delta: "+weeks on affected lithography module production"
+quantified_impact:
+  facility_damage: "Production area damaged; cleanroom and utilities restored over weeks"
+  shipments: "Module delays reported, with a company statement that the financial effect was under review"
+  insurance: "Property and BI claim on a highly specialised production line"
+sources:
+  - title: "ASML says fire at Berlin plant will delay some shipments"
+    url: "https://www.reuters.com"
+  - title: "ASML Berlin fire: production impact assessment"
+    url: "https://www.bloomberg.com"
+lessons: >-
+  A small site can be a monopoly site. Upstream tool modules are as
+  chokepoint-y as fabs, and their outage shows up in shipment timing
+  months later rather than in spot prices.

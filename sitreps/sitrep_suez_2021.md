@@ -11,7 +11,7 @@
 https://www.suezcanal.gov.eg
 
 **Corroboration:** 49 signals, 9 source types | **Region:** middle_east | **Market lens:** semicon
-**Relevance to semicon:** 0.3 / 1 (cosine similarity, signal text vs market context)
+**Relevance to semicon:** 0.28 / 1 (cosine similarity, signal text vs market context)
 
 ### Weather Disruption Index (WDI)
 
@@ -34,24 +34,29 @@ https://www.suezcanal.gov.eg
 | Event | Date | Match | Documented insured impact | Weight |
 |---|---|---|---|---|
 | Suez Crisis canal closure | 1956-10-29 | 0.46 | — | w=0.46 |
+| Eyjafjallajokull ash cloud airspace closure | 2010-04-14 | 0.33 | — | w=0.33 |
 | Tianjin port explosion | 2015-08-12 | 0.30 | $3,500M | w=0.30 |
-| Texas Winter Storm Uri fab shutdowns | 2021-02-14 | 0.17 | $360M | w=0.17 |
+| Great Hanshin (Kobe) earthquake | 1995-01-17 | 0.29 | — | w=0.29 |
 
 ### Projected insured impact
 
-Match-weighted mean of documented analog losses: **$2,338M** (precedent range $360M–$3,500M; each weight is the row's match score above). **EXCEEDS** the PCS $25M catastrophe-designation threshold.
+Match-weighted mean of documented analog losses: **$3,500M** (precedent range $3,500M–$3,500M; each weight is the row's match score above). **EXCEEDS** the PCS $25M catastrophe-designation threshold. **Thin precedent set — treat as order-of-magnitude only, not a booking estimate.**
 
 ### Recommended insurer actions
 
 - **Declare CAT readiness now:** initiate PCS-style catastrophe tracking for the affected region — spin up a dedicated claims serial number and reserve committee review before policyholder volume spikes.
 - **Claims capacity:** pre-stage adjusters and surge call-center staffing for the footprint; expect first notices of loss within 24–72h of the exposure event.
 - **Underwriting hold:** pause new-binding authority in the affected geography/sector pending loss confirmation.
-- **Reinsurance notification:** projected $2,338M clears the PCS $25M designation line — notify reinsurance partners and verify attachment-point availability for the exposed portfolio.
+- **Reinsurance:** projected exposure exceeds the PCS $25M threshold but rests on a thin precedent set — verify analog basis before any notification.
 - **Portfolio triage:** proximity-ranked watchlist — Suez Canal, Port of Iskenderun, Ceyhan oil terminal. Pull exposure reports and flag concentration above retention thresholds for proactive outreach/mitigation.
 
 ### How we scored this
 
 - 49 signals from 36 distinct sources; hazard composite 0.76 via rubric (type/proximity/corroboration/spread/escalation).
 - Exposure = distance-decayed chokepoint criticality; vulnerability = sector-resilience prior per node kind.
-- Analogs picked by mechanism/sector/geo similarity; projected loss = match-weighted mean of documented analog losses, scaled by severity ratio (capped 0.33–1.5×).
+- Analogs picked by mechanism/sector/geo similarity; projected loss = match-weighted mean of documented analog losses — no severity scaling; every dollar traces to a named case file.
 - Caveat: automated early-warning signal, not underwriting advice. Replay data is curated and point-in-time; projections are analog-derived estimates, not observed outcomes.
+
+## AI council read
+
+No council brief for this event yet (the council analyses new or escalating events only).

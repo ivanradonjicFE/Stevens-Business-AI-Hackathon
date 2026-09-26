@@ -40,7 +40,10 @@ def assess_exposure(
         reverse=True,
     )[:TOP_N]
     if not cluster.exposure:
-        log.warning(
+        # debug, not warning: peripheral noise clusters legitimately sit far
+        # from every monitored node, and warnings would spray stderr over
+        # the TUI.
+        log.debug(
             "cluster %s: no chokepoints within exposure range",
             cluster.event_id,
         )

@@ -1,7 +1,7 @@
 [project]
 name = "watchtower"
 version = "0.1.0"
-description = "Add your description here"
+description = "Supply-shock early-warning terminal: correlates public news, weather, and hazard signals into scored events with historical analogs"
 readme = "README.md"
 authors = [
     { name = "dramfin", email = "20ramirez.diego03@gmail.com" }
@@ -12,6 +12,11 @@ dependencies = [
     "pyyaml>=6.0.3",
     "textual>=8.2.8",
 ]
+
+# Optional: enables the LLM path of the agent council. Without it the
+# council still runs, on its deterministic rule fallback.
+[project.optional-dependencies]
+ai = ["openai>=1.40"]
 
 [project.scripts]
 watchtower = "watchtower:main"

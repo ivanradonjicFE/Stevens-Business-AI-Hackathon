@@ -1,0 +1,31 @@
+id: uaw_strike_2023
+name: UAW stand-up strike (US automakers)
+date: 2023-09-15
+duration_days: 46
+region: [42.33, -83.05]
+report_region: north_america
+mechanisms: [labor_disruption, shipping_delay, market_reaction]
+sectors_hit: [autos, container_shipping, electronics]
+summary: >-
+  The United Auto Workers ran a targeted "stand-up" strike against the
+  three large US automakers, starting at a few plants and expanding as
+  talks stalled. The pattern cost the automakers billions in lost
+  production and idled supplier lines, with knock-on layoffs across
+  component makers that also serve electronics customers.
+market_reaction:
+  index_move: "Automaker shares sensitive to strike duration; suppliers hit harder than OEMs"
+  spot_prices: "Vehicle inventory and incentive dynamics shifted; parts demand dipped"
+  lead_time_delta: "Supplier schedules reworked week by week as strike scope changed"
+quantified_impact:
+  production: "Plants idled across multiple states; automakers reported billions in lost output"
+  suppliers: "Tier-1 and Tier-2 suppliers issued layoffs and shortened shifts"
+  insurance: "Contingent business interruption and trade credit exposure in the supply base"
+sources:
+  - title: "UAW strike against Detroit automakers expands"
+    url: "https://www.reuters.com"
+  - title: "Auto suppliers cut shifts as UAW strike drags on"
+    url: "https://www.bloomberg.com"
+lessons: >-
+  Labour events escalate in discrete steps, which makes duration the
+  hardest variable to score. Suppliers absorb more damage than the
+  headline OEMs and are usually where the insurance loss sits.

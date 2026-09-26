@@ -1,0 +1,31 @@
+id: noto_earthquake_2024
+name: Noto Peninsula earthquake (Ishikawa)
+date: 2024-01-01
+duration_days: 45
+region: [37.50, 137.24]
+report_region: asia
+mechanisms: [seismic, infrastructure, fab_shutdown, shipping_delay]
+sectors_hit: [electronics, autos, container_shipping]
+summary: >-
+  A magnitude 7.6 earthquake on the Noto Peninsula damaged buildings,
+  roads, power and water infrastructure across Ishikawa and Toyama.
+  Several electronics and component plants in the Hokuriku region halted
+  operations for damage inspection and utility restoration, and ports on
+  the Japan Sea coast were disrupted for weeks.
+market_reaction:
+  index_move: "Muted index reaction; component lead-time risk concentrated in affected suppliers"
+  spot_prices: "Local logistics costs rose; some components shifted to alternate lines"
+  lead_time_delta: "+1-3 weeks on affected component lines"
+quantified_impact:
+  facility_outages: "Multiple fabs and component plants offline for inspection and utility repairs"
+  infrastructure: "Road, water and power damage across the peninsula; port calls reduced"
+  insurance: "Large earthquake property and business-interruption losses; supply-chain clauses tested"
+sources:
+  - title: "Japan earthquake: factories halt as damage assessed"
+    url: "https://www.reuters.com"
+  - title: "Noto quake disrupts Hokuriku manufacturing"
+    url: "https://asia.nikkei.com"
+lessons: >-
+  Utility restoration, not structural damage, usually sets the restart
+  clock. Component plants that look peripheral can sit on a
+  single-source path for automotive customers.
